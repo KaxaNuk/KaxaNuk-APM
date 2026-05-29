@@ -1,0 +1,9 @@
+name: kaxanuk-apm-common
+version: 0.1.0
+description: APM project for common KaxaNuk system uses
+author: Rinku Kazeno
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

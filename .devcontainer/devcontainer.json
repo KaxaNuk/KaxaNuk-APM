@@ -1,0 +1,17 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+	"name": "KaxaNuk-APM",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "workspace-knapm",
+    "workspaceFolder": "/workspace",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Configure tool-specific properties.
+    "customizations" : {
+        "jetbrains" : {
+          "backend" : "PyCharm"
+        }
+    }
+}

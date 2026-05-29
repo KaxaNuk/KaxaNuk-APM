@@ -1,0 +1,5 @@
+services:
+  workspace-knapm:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
