@@ -3,6 +3,8 @@ Microsoft APM-compatible AI scaffolding packages for use in KaxaNuk systems.
 
 To use it you must first install APM, and then add as an APM dependency the package or its individual contents.
 
+---
+
 ## Installing APM
 You can use the either the automated or manual way to install APM.
 
@@ -27,12 +29,17 @@ In case you want to execute the steps manually:
     apm.lock.yaml
     ```
 
-**Pro-tip**: use the `--target` option when installing for your specific agent system.
-
-Example: `apm install %YOUR_SELECTED_PACKAGE% --target claude`
-
+---
 
 ## Adding the APM Dependencies
+
+Before installing dependencies, it's recommended to configure your target agent system with `apm config set target <env>`.
+For example if using Claude:
+```bash
+apm config set target claude
+```
+
+You can check the available targets at <https://github.com/microsoft/apm/blob/main/docs/src/content/docs/concepts/primitives-and-targets.md#target-catalogue>
 
 ### Add a specific package
 Each subfolder in this repo containing an `apm.yml` file is its own APM package.
@@ -56,6 +63,8 @@ Run the following command, replacing `%YOUR_MCP_SERVER_URL%` with the URL of the
 apm install --mcp %YOUR_MCP_SERVER_URL%
 ```
 
+---
+
 ## Updating
 Every change to the AI primitives in this repo increments the packages' versions. APM pins dependencies to the versions it downloaded during install.
 
@@ -64,6 +73,7 @@ To update all the APM dependencies to the latest versions, run:
 apm install --update
 ```
 
+---
 
 ## Development of this repo
 Install the Python dev dependencies:
