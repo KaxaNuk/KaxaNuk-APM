@@ -1,12 +1,12 @@
 ---
 name: devcontainer-aware-command-execution
 description: >
-  Load this skill whenever you might need to execute any shell commands.
+  Load this skill whenever you might need to execute any shell commands, including running any cli scripts.
   It explains the required way to run commands in the current environment.
   Any commands you or any subagent may run on the command line will fail unless these instructions are followed.
   Applies to both coding and research tasks.
 metadata:
-  version: 0.2
+  version: 0.2.1
 ---
 
 # Dev Container Aware Command Execution
