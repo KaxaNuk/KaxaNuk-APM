@@ -42,7 +42,13 @@ apm config set target claude
 You can check the available targets at <https://github.com/microsoft/apm/blob/main/docs/src/content/docs/concepts/primitives-and-targets.md#target-catalogue>
 
 ### Add a specific package
-Each subfolder in this repo containing an `apm.yml` file is its own APM package.
+Each subfolder in this repo containing an `apm.yml` file is its own APM package:
+
+| Package | Contents |
+|---|---|
+| `common` | Primitives for any KaxaNuk system: APM usage, dev container aware command execution, MCP env var propagation, Python style and filesystem instructions. |
+| `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
+
 For example, to add the `common` package to your project:
 ```bash
 apm install KaxaNuk/KaxaNuk-APM/common
