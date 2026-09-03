@@ -21,7 +21,9 @@ before a strategy can graduate, and one this stack can actually answer because s
 
 The method is Paleologo's (*Advanced Portfolio Management*, chapter 8): split total return into
 factor and idiosyncratic, then split the idiosyncratic part three ways **by counterfactual books,
-never by formula**. Every counterfactual below is a weight file, so the same `engine.py` that
+never by formula**. The template repository ships a note on the book at
+`Bibliotheca/Books/Paleologo_2021_Advanced_Portfolio_Management/INDEX.md`, and one on Grinold &
+Kahn for the information coefficient the analyzer screens with; read those before this. Every counterfactual below is a weight file, so the same `engine.py` that
 priced the real book prices it, over the same window, at the same costs.
 
 Work in the experiment's notebook, section 5 or a section after it. Record every number in
