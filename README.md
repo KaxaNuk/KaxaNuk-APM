@@ -48,6 +48,7 @@ Each subfolder in this repo containing an `apm.yml` file is its own APM package:
 |---|---|
 | `common` | Primitives for any KaxaNuk system: APM usage, dev container aware command execution, MCP env var propagation, Python style and filesystem instructions. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
+| `investment-lab` | Primitives for KaxaNuk Investment Lab strategy repositories built from the KN Research Process template: the experiment lifecycle and document architecture, and alpha decomposition — reading attribution into selection, sizing and timing skill. |
 
 For example, to add the `common` package to your project:
 ```bash
