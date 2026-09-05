@@ -1,25 +1,33 @@
 # KaxaNuk-APM
-Microsoft APM-compatible AI scaffolding packages for use in KaxaNuk systems.
 
-To use it you must first install APM, and then add as an APM dependency the package or its individual contents.
+Microsoft APM-compatible AI scaffolding packages for use in KaxaNuk systems: how we code, how we
+work, and how each module of the KaxaNuk Investment Lab is used — written for the agent that pairs
+with you.
+
+To use it you must first install APM, and then add as an APM dependency the package or its
+individual contents.
 
 ---
 
 ## Installing APM
-You can use the either the automated or manual way to install APM.
 
-### Automated Installation
+You can use either the automated or the manual way to install APM.
+
+### Automated installation
+
 Give this prompt to your AI assistant:
+
 ```text
 Please run the command that you can find in https://github.com/KaxaNuk/KaxaNuk-APM/common/.apm/prompts/initialize-apm.prompt.md
 ```
 
-### Manual Installation
-In case you want to execute the steps manually:
+### Manual installation
+
 1. Install APM in your dev environment. Preferably add `apm-cli` to your pyproject dev dependencies.
 2. `apm init` the repo if it doesn't have an `apm.yml` file at the root.
 3. Install the parts you want from APM.
-4. Recommended: Add the following lines to your `.gitignore` file to keep your local AI setup from polluting the repo:
+4. Recommended: add the following lines to your `.gitignore` file to keep your local AI setup from
+   polluting the repo:
     ```
     # AI - managed by APM
     .agents/
@@ -31,32 +39,55 @@ In case you want to execute the steps manually:
 
 ---
 
-## Adding the APM Dependencies
+## Starting an investment strategy
 
-Before installing dependencies, it's recommended to configure your target agent system with `apm config set target <env>`.
+The fastest way in. Give this prompt to your AI assistant, and it copies the public **KN Research
+Process template** (`KaxaNuk/KaxaNuk-Research-Process`), initialises APM and installs the three
+packages below:
+
+```text
+Please run the prompt at https://github.com/KaxaNuk/KaxaNuk-APM/investment-lab/.apm/prompts/start-a-strategy.prompt.md with strategy_name=<your strategy>
+```
+
+The template's `README.md` then says what to fill in, in order. A **researcher** — a companion you
+name and teach, which reads a strategy's `Bibliotheca/` and drafts the hypothesis in each blueprint
+— is a separate project at `KaxaNuk/KaxaNuk-Researcher`.
+
+---
+
+## Adding the APM dependencies
+
+Before installing dependencies, configure your target agent system with `apm config set target <env>`.
 For example if using Claude:
+
 ```bash
 apm config set target claude
 ```
 
-You can check the available targets at <https://github.com/microsoft/apm/blob/main/docs/src/content/docs/concepts/primitives-and-targets.md#target-catalogue>
+You can check the available targets at
+<https://github.com/microsoft/apm/blob/main/docs/src/content/docs/concepts/primitives-and-targets.md#target-catalogue>
 
 ### Add a specific package
+
 Each subfolder in this repo containing an `apm.yml` file is its own APM package:
 
 | Package | Contents |
 |---|---|
-| `common` | Primitives for any KaxaNuk system: APM usage, dev container aware command execution, MCP env var propagation, Python style and filesystem instructions. |
+| `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
-| `investment-lab` | Primitives for KaxaNuk Investment Lab strategy repositories built from the KN Research Process template: the experiment lifecycle and document architecture, and alpha decomposition — reading attribution into selection, sizing and timing skill. |
+| `investment-lab` | Primitives for strategy repositories built from the KN Research Process template: `experiment-lifecycle` (the eight steps, the document architecture, the notebook contract, the restrictions and the gate), `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books), and the `start-a-strategy` prompt. |
 
 For example, to add the `common` package to your project:
+
 ```bash
 apm install KaxaNuk/KaxaNuk-APM/common
 ```
 
 ### Pick and mix
-If you just want specific AI primitives without installing the rest, just add the relevant folder (for skills) or `.md` file (for instructions, prompts, etc.):
+
+If you just want specific AI primitives without installing the rest, add the relevant folder (for
+skills) or `.md` file (for instructions, prompts, etc.):
+
 ```bash
 # Skills require the folder:
 apm install KaxaNuk/KaxaNuk-APM/common/.apm/skills/devcontainer-aware-command-execution
@@ -65,7 +96,9 @@ apm install KaxaNuk/KaxaNuk-APM/common/.apm/instructions/filesystem-boundaries.i
 ```
 
 ### Add an MCP server
+
 Run the following command, replacing `%YOUR_MCP_SERVER_URL%` with the URL of the MCP server:
+
 ```bash
 apm install --mcp %YOUR_MCP_SERVER_URL%
 ```
@@ -73,22 +106,69 @@ apm install --mcp %YOUR_MCP_SERVER_URL%
 ---
 
 ## Updating
-Every change to the AI primitives in this repo increments the packages' versions. APM pins dependencies to the versions it downloaded during install.
+
+Every change to the AI primitives in this repo increments the packages' versions. APM pins
+dependencies to the versions it downloaded during install.
 
 To update all the APM dependencies to the latest versions, run:
+
 ```bash
 apm install --update
 ```
 
 ---
 
+## Where this is going
+
+**One skill per step of the KN Research Process, and one per Lab module as each lands.** Today
+`investment-lab` carries the process and the attribution reading, and `data-curator` carries the
+Curator's calculations. Planned, in roughly this order: `bibliotheca` (writing a source note in the
+convention, what a lead is, what may be cited), `universe` (the point-in-time seed, data issues,
+usable dates), `refinery` (`r_*` columns, causality, the rank identity), `analyzer` (the information
+coefficient table, the two questions any signal owes), `portfolio-construction` (the one signature,
+constraints as levers), `backtest-engine` (the weight file, cash as a position, one window),
+`attribution-analysis` (shaping the inputs, what is missing first), `paper-trading` (the gate,
+re-fit nothing). Each skill names which library call is the deterministic tool — **the agent never
+computes the number itself.**
+
+**Distribution.** The packages stay installable with `apm install` from any harness. A Claude
+plugin marketplace built with `apm pack` is planned, so people add one marketplace and receive
+updates.
+
+---
+
+## Contributing
+
+Pull requests are the way this improves — send one when a skill misled you, and say what it should
+have said. Three rules keep the packages safe to publish:
+
+1. **Worked examples come from the template's `example` branch only.** Never from a KaxaNuk in-house
+   strategy, a client, or a live book — no signal, no universe, no result of theirs.
+2. **Skills document the interface, never the implementation.** Entities, calls, file layouts, and
+   what a module must never be asked to do; not how a licensed library computes, and not proprietary
+   methodology such as how a factor model's factors are built.
+3. **Scan the history for secrets before a release.** Nothing from a `.env` file, no token in a
+   notebook output or a log line.
+
+The references in `investment-lab/.apm/skills/experiment-lifecycle/references/` are copies of the
+template's files. Regenerate them rather than editing them:
+
+```bash
+python tools/sync_investment_lab_references.py
+```
+
+---
+
 ## Development of this repo
+
 Install the Python dev dependencies:
+
 ```bash
 pip install -r requirements-dev.txt
 ```
 
 Install the APM dev dependencies:
+
 ```bash
 apm install --dev
 ```

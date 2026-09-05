@@ -7,22 +7,21 @@
 > append-only and dated. Nor is it the hypothesis — once an idea here is committed to, it is written
 > into [`BLUEPRINT_N.md`](BLUEPRINT_N.md) and fixed.
 >
-> **Entry format:**
->
-> ```
-> ## YYYY-MM-DD — <short topic>
->
-> - Idea / question:
-> - What we tried / considered:
-> - Outcome / decision:
-> - Open threads:
-> ```
+> Keeping the two apart is what stops planning being mistaken for history.
+
+**Entry format:**
+
+```
+## YYYY-MM-DD — short topic
+
+- Idea / question:
+- What we tried / considered:
+- Outcome / decision:
+- Open threads:
+```
 
 ---
 
-## <YYYY-MM-DD> — <first entry>
-
-- **Idea / question:**
-- **What we tried / considered:**
-- **Outcome / decision:**
-- **Open threads:**
+The first entry is usually *choosing the benchmark*: what should every future experiment be measured
+against, which candidates were considered, and the one property that decided between them — a
+benchmark is chosen for being transparent, liquid and stable, not for being clever.

@@ -1,53 +1,55 @@
 # Findings — Experiment N
 
 > **Latest valuable results only.** This file is rewritten when a result changes, not appended to —
-> the running history is in [`JOURNAL_N.md`](JOURNAL_N.md).
+> the running history is in [`JOURNAL_N.md`](JOURNAL_N.md), and the hypothesis this tested is in
+> [`BLUEPRINT_N.md`](BLUEPRINT_N.md).
 >
-> **[`RESULTS.md`](../../RESULTS.md) is compiled from this file.** When a finding here changes,
-> change it here first, then update the summary.
->
-> The hypothesis this tested is in [`BLUEPRINT_N.md`](BLUEPRINT_N.md).
+> **[`../../RESULTS.md`](../../RESULTS.md) is compiled from this file.** When a finding here
+> changes, change it here first, then update the summary.
 
 ## Status
 
-**<One line: adopted as the benchmark / leading candidate, not graduated / rejected.>** <Then which
-criteria of the gate in `Paper_Trading/BITACORA.md` it clears and which it does not.>
+**Not yet run.** When it has: one line saying whether the benchmark is adopted, and the reminder
+that the benchmark is not a graduation candidate — its job is to be the thing others are measured
+against.
 
-## The variants, priced by the engine
+## The predictions, evaluated
 
-Every variant priced by the **KaxaNuk Backtest Engine** over one window shared by all of them
-(`engine.align_to_common_start`). The control row is the benchmark's rule re-struck on this
-experiment's window.
+**Every prediction in the blueprint gets a row, including the ones that were wrong.** A falsified
+prediction is worth more than a correct one: it says something about the strategy that nobody knew,
+and it cost one run to find out.
 
-**<N> variants were ranked.** The count is published because a reader cannot discount a best-of-N
-result without knowing N.
+| # | Prediction | Outcome | What it changed |
+| --- | --- | --- | --- |
+| 1 | as written in the blueprint | confirmed or falsified, with the number | what is now understood differently |
 
-| Variant | CAGR | Vol | Sharpe | Max DD | vs control |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| **<winner>** | | | | | |
-| *<control>* | | | | | — |
+## The book, priced by the engine
 
-<Any excluded run, by name, with its reason — a truncated engine run, a rejected book. A metric
-computed over a truncated run does not belong in the same column as a complete one.>
+Record the date of the last full re-run from a wiped working copy, the engine version, and the
+window. Then the book against every benchmark it reports against: CAGR, volatility, Sharpe, Sortino,
+maximum drawdown.
 
-## What this experiment established
+## What the benchmark actually is, structurally
 
-1. **<The headline, in one sentence, with its number.>** <Then the reading — what the number means
-   and what it does not.>
-2. **<Each lever's result, read as a curve across its sweep, never as the single best cell.>**
-3. **<Any prediction made from the analyzer before the backtest, and whether it held.>**
+Rebalance frequency, turnover, holdings, concentration, invested share, and any structural tilt —
+each with a reading of what a bad value would have meant.
 
-## Attribution
+## Attribution — is this the signal, or a factor exposure wearing its name?
 
-<Step 6 for this book: Brinson-Fachler allocation, selection and interaction; KN5FM factor against
-idiosyncratic. What it settles — is there idiosyncratic alpha? — and what it does not. If it has not
-been run on this variant, say so: criterion 2 of the gate is evaluable on this stack and unevaluated
-is not the same as passed.>
+Brinson-Fachler: allocation, selection, interaction. The factor model: factor against idiosyncratic.
+State the window, which is bound by the supplied files' coverage and is usually shorter than the
+backtest.
+
+**What it settles**, and **what it does not** — naming the counterfactual book that would settle
+what is left: the same holdings with the signal off, positions equalised, a random draw at the same
+sizes, entry dates shifted.
+
+## What is open, ranked
+
+The single highest-value run outstanding, and what it would settle.
 
 ## Caveats
 
-- **<The margin against the control and whether it survives deflation.>**
-- **<Which conclusions rest on one episode, one regime, one window.>**
-- **What the engine does not model** that matters for this book — borrow cost, capacity.
-- **Nothing here is out of sample**, and no variant has a control arm differing in exactly one
-  thing, until one does.
+| # | Caveat | Effect |
+| --- | --- | --- |
+| 1 | what a reader must know before quoting a number above | what it does to that number |

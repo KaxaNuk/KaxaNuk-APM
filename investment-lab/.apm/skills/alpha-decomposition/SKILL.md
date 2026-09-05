@@ -3,13 +3,14 @@ name: alpha-decomposition
 description: >
   Load this skill when a KaxaNuk Investment Lab strategy beats its benchmark and the question
   becomes "is the signal doing anything, or is this a factor exposure wearing the signal's name?".
-  Use it to read Attribution Analysis output (Brinson-Fachler, KN5FM), to decompose idiosyncratic
-  return into selection, sizing and timing by building counterfactual books the Backtest Engine can
-  price, to run the exclusion-filter test when the factor model is blind to an absolute rule, and
-  to evidence graduation criterion 2. It does NOT run the engine or the attribution library for
-  you — it says which books to price and how to read the numbers that come back.
+  Use it to read Attribution Analysis output in two layers and a third pass — Brinson-Fachler, the
+  factor model, Brinson-Fachler again on the residual — to decompose idiosyncratic return into
+  selection, sizing and timing by building counterfactual books the Backtest Engine can price, to
+  run the exclusion-filter test when the factor model is blind to an absolute rule, and to evidence
+  graduation criterion 2. It does NOT run the engine or the attribution library for you — it says
+  which books to price and how to read the numbers that come back.
 metadata:
-  version: 0.1
+  version: 0.2
 ---
 
 # Alpha decomposition — is the signal doing anything?
@@ -19,28 +20,36 @@ procedure that turns "the book went up" into "here is the part of the return tha
 here is the part that is beta, size, sector and luck" — the question `RESULTS.md` has to answer
 before a strategy can graduate, and one this stack can actually answer because step 6 exists.
 
-The method is Paleologo's (*Advanced Portfolio Management*, chapter 8): split total return into
-factor and idiosyncratic, then split the idiosyncratic part three ways **by counterfactual books,
-never by formula**. The template repository ships a note on the book at
-`Bibliotheca/Books/Paleologo_2021_Advanced_Portfolio_Management/INDEX.md`, and one on Grinold &
-Kahn for the information coefficient the analyzer screens with; read those before this. Every counterfactual below is a weight file, so the same `engine.py` that
-priced the real book prices it, over the same window, at the same costs.
+The method is Paleologo's (*Advanced Portfolio Management*, 2021, chapter 8): split total return
+into factor and idiosyncratic, then split the idiosyncratic part three ways **by counterfactual
+books, never by formula**. The book is a lead in the template's `Bibliotheca/BIBLIOGRAPHY.md`; write
+its note before citing it in a findings file. Every counterfactual below is a weight file, so the
+same `Experiments/backtest_engine.py` that priced the real book prices it, over the same window, at
+the same costs.
 
 Work in the experiment's notebook, section 5 or a section after it. Record every number in
 `FINDINGS_N.md`, then `RESULTS.md`. Publish the count of counterfactuals run.
 
-## 1. First, the factor / idiosyncratic split — read what step 6 already reports
+## 1. First, two layers and a third pass — read what step 6 reports
 
-Run both KaxaNuk methodologies (the experiment notebook's attribution cell does this) and pull out:
+Savvy investors follow a process, a thesis and data, and attribution gives all three about a book.
+Run both methodologies (the experiment notebook's attribution cell does this) and record:
 
-| From | Numbers to record | The question each answers |
-| --- | --- | --- |
-| **Brinson-Fachler** | cumulative alpha; **allocation**, **selection**, **interaction** effects | is the return the sectors the book leans into, or the names it picks inside them? |
-| **KN5FM** | total excess; **factor** contribution by factor — beta, size, value, momentum, residual volatility, industries — and the **idiosyncratic** residual | how much of this is a factor fund wearing the strategy's name? |
+| Layer | From | Numbers to record | The question it answers |
+| --- | --- | --- | --- |
+| **First cut** | Brinson-Fachler | cumulative alpha; **allocation**, **selection**, **interaction** | is the return the groups the book leans into, or the names it picks inside them? The exact lever that moved |
+| **Second layer** | the factor model | total excess; **factor** contribution by factor — beta, size, value, momentum, residual volatility, liquidity, industries — and the **idiosyncratic** residual | which systematic premia paid, on purpose or by accident? How much of this is a factor fund wearing the strategy's name? |
+| **Third pass** | Brinson-Fachler on the residual | allocation and selection of the return left after factor exposure is stripped | does the selection story survive — and would the Sharpe survive once that factor turns? |
+
+The third pass is what the first cut alone cannot give: a book that looks like skilful stock-picking
+in Brinson-Fachler can be a persistent low-beta or momentum tilt that happened to pay over the
+sample. If the attribution library does not run Brinson-Fachler on residual returns directly, build
+the residual series from the factor model's output and run the first cut on it in the notebook —
+and say in `FINDINGS_N.md` that it was done that way.
 
 Two readings, both of which count as answers:
 
-- **Allocation ≈ 0 with selection and interaction positive** means a large sector tilt is *not*
+- **Allocation ≈ 0 with selection and interaction positive** means a large group tilt is *not*
   where the money comes from. Say so plainly; it is the opposite of what the tilt makes a reader
   assume.
 - **A roughly even factor / idiosyncratic split** is a *pass with a qualification* on criterion 2.
@@ -53,13 +62,14 @@ attribution numbers are only comparable across runs when the factor set is ident
 
 ## 2. When the factor model is blind — the absolute-versus-relative problem
 
-**Momentum in a factor model is relative**: a name ranked against its peers. **A trend rule is
-absolute**: a name against its own history. The two produce different books from the same names,
-and a factor model built on the relative kind is close to invisible to an absolute rule. So a
-strategy can beat every benchmark while KN5FM assigns ~0% to the factor its thesis is named after.
+**Momentum in a factor model is relative**: a name ranked against its peers. **A trend or regime
+rule is absolute**: a name against its own history. The two produce different books from the same
+names, and a factor model built on the relative kind is close to invisible to an absolute rule. So a
+strategy can beat every benchmark while the model assigns roughly nothing to the factor its thesis
+is named after.
 
 **That is a finding, not a failure**, and it is the expected state for any threshold signal — a
-moving-average cross, a breakout, a drawdown gate. When you see it:
+moving-average cross, a breakout, a regime label, a drawdown gate. When you see it:
 
 1. Say so in `FINDINGS_N.md`, in those terms.
 2. Do not conclude the signal is weak. Conclude the model cannot see it, and go to section 4.
@@ -73,9 +83,9 @@ counterfactuals, or the comparison is dominated by residual slivers nobody was b
 
 Each counterfactual keeps everything about the real book except one thing. The Sharpe difference
 between the real book and the counterfactual, over the same engine window, is that one thing's
-contribution. All three read the objects the experiment notebook already has — `eligible_matrix`,
-`selected_matrix`, `REBALANCE_DATES`, `target_weights`, `sizing_matrix` — and hand a new
-`target_weights` to `engine.to_engine_frame` and `engine.run_variant`.
+contribution. All three read the objects the experiment notebook already has — `selected_matrix`,
+`REBALANCE_DATES`, `target_weights`, and the eligibility matrix the rule built them from — and hand a
+new `target_weights` to `backtest_engine.to_engine_frame` and `backtest_engine.run_variant`.
 
 ### 3a. Sizing skill — equalise positions within each date
 
@@ -88,7 +98,8 @@ sizing_counterfactual = held.astype(float).div(held.sum(axis=1), axis=0).fillna(
 
 **Sharpe(real) − Sharpe(equal-weighted) is what sizing contributed.** Positive means the big
 positions were the good ones. This is the cheapest counterfactual and often already exists: an
-equal-weight variant in the same experiment *is* this book.
+equal-weight variant in the same experiment *is* this book — and for a benchmark that is already
+equal weight, sizing skill is zero by construction and should be reported as such.
 
 ### 3b. Selection skill — a random draw from the eligible pool at the same sizes
 
@@ -156,22 +167,31 @@ contributes as a filter**, which a factor model cannot measure.
 sizing rule's own selection, and the honest description of the strategy is "top-N by the sizing
 column". That is worth knowing and belongs in `OBJECTIVE.md` as a falsified claim.
 
-## 5. The worked example — the reference implementation
+## 5. The worked example — the template's `example` branch
 
-Golden Flow, Experiment 1 against KN600, 2017-01-03 to 2025-08-12, 99.5% factor coverage:
+The KN Research Process template carries one strategy worked end to end on its `example` branch:
+twelve asset-class ETFs, a statistical jump model fitted per asset in the Refinery, and the
+benchmark rule — hold every asset in its good regime, equally weighted, cash for the rest. The
+licensed engines were absent from that clone, so **it was never priced and has no attribution**.
+It still settled three things before any engine ran, and each is a lesson for this skill:
 
-- **Brinson-Fachler:** +24% cumulative alpha; allocation **≈ 0%**, selection **+5.7%**, interaction
-  **+18%**. A large Technology overweight that contributed nothing on its own.
-- **KN5FM:** ~+17% total excess; beta **+10.5%**, size **+9.8%**, momentum **+1.0%**,
-  idiosyncratic **~+9%**. Half factor, half idiosyncratic — criterion 2 passed with a qualification.
-- **Section 2 applied:** the golden cross is an absolute rule; KN5FM's momentum is relative; the
-  ~1% momentum contribution is the model's blindness, not the signal's weakness.
-- **Sizing (3a), already measured without anyone reading it as such:** Experiment 2's equal-weight
-  variant against its ADTV-weighted control, same window — **0.8728 against 0.9024 Sharpe**, so ADTV
-  sizing contributed **+0.03 Sharpe of sizing skill**. Small, positive, stated in exactly those
-  terms.
-- **Selection (3b), timing (3c) and the exclusion filter (4): never run.** They are the top open
-  leads in that repository's `RESULTS.md`, and they need no new data.
+- **The signal separates risk, not return.** In the good regime forward volatility is lower on
+  11 of 12 assets (−5.6 points a year) while forward return is higher on only 5 of 12. So the
+  decomposition to expect, once priced, is a Sharpe gain through the denominator — and section 3b's
+  random draws should be read on volatility as well as Sharpe.
+- **Look-ahead was worth 44 annualised points.** The same fitted model read with hindsight
+  (smoothed labels) showed a good-minus-bad forward return of +38.9%; read causally, −5.1%. The
+  two agree on 81% of days and differ exactly at the turning points. Before decomposing any fitted
+  signal, run this audit; it is one line of code and routinely the largest number in the file.
+- **A blueprint prediction was falsified by the book's shape alone.** The blueprint predicted the
+  book would average roughly half in cash; it averaged 95.3% invested, because equal weight over a
+  shrinking eligible set concentrates rather than de-risks. The two levers the blueprint declined —
+  a weight cap and a minimum holding count — turned out to be the entire defensive mechanism.
+
+**What to run first when it is priced:** the exclusion-filter test (section 4), because the
+strategy *is* the filter — same twelve assets, always eligible, equal weight. Sizing skill (3a) is
+zero by construction. Timing (3c) matters, because the rule re-strikes about 40 times a year with
+one-way turnover near 810% — the number most likely to decide whether the idea survives costs.
 
 ## What this skill will not let you do
 
@@ -182,4 +202,6 @@ Golden Flow, Experiment 1 against KN600, 2017-01-03 to 2025-08-12, 99.5% factor 
 - **Tune on the counterfactuals.** They measure the rule you stated in `BLUEPRINT_N.md`. A rule
   changed to look better against its own counterfactual is a new experiment with a new blueprint.
 - **Quote a number that did not come from the engine.** Every counterfactual is priced by
-  `engine.run_variant` over the shared window, never approximated.
+  `backtest_engine.run_variant` over the shared window, never approximated.
+- **Use an in-house KaxaNuk strategy as a worked example.** Examples in this public package come
+  from the template's `example` branch only.

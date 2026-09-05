@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-05
+### Added
+- `how-we-work` skill: the issue-before-branch rule, the `issues/<number>` convention, the
+  pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it to
+  libraries, research repositories and APM packages, plus how a release is tagged.
+
 ## [0.1.1] - 2026-07-08
 ### Changed
 - Updated the description of the `devcontainer-aware-command-execution` skill to reflect its usage for cli scripts.

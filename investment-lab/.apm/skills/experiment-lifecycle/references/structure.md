@@ -1,64 +1,72 @@
 # Repository structure
 
-The canonical tree of a KaxaNuk Investment Lab strategy repository, as shipped by the
-**KN Research Process template** (`KaxaNuk-Community/R_KN-Research-Process`). Stage-owned folders
-at the root; one experiment folder per idea; four documents at the root that carry the whole state.
+The canonical tree of a KaxaNuk Investment Lab strategy repository, as shipped by the **KN Research
+Process template** — public at `KaxaNuk/KaxaNuk-Research-Process`, `main` only. **The template is
+the source of truth for this tree; this file is a copy of what it looked like at the version named
+below.** When they disagree, the template wins, and this file is regenerated with
+`python tools/sync_investment_lab_references.py`.
+
+Template version: **0.4.0**. On `main` every file is a description of what is expected in it; the
+`.py` files are docstrings, the notebooks are markdown cells, the seed has a header and no rows.
 
 ```
 <Strategy_Name>/
 ├── OBJECTIVE.md                 # the idea, the objective, the claims and their status
-├── RESULTS.md                   # executive summary compiled from FINDINGS_N.md; methods appendix
-├── CHANGELOG.md                 # every version, Data Curator convention
-├── AGENTS.md                    # how work is done here
+├── RESULTS.md                   # executive summary compiled from FINDINGS_N.md, citing each
+├── CHANGELOG.md                 # every version, newest first; what a version number means here
+├── AGENTS.md                    # how work is done: workflow, restrictions, the bar, the five lies
 ├── CLAUDE.md                    # one line: @AGENTS.md
-├── README.md                    # what it is, every .md explained, how to run it
-├── pyproject.toml  uv.lock      # Python >=3.14, uv-managed; licensed engines deliberately absent
+├── README.md                    # what it is, the eight steps, where each kind of logic goes
+├── LICENSE                      # MIT
+├── pyproject.toml               # Python >=3.14, uv-managed; licensed engines deliberately absent
 ├── Config/
-│   └── .env.template            # KNDC_API_KEY_FMP, KNBE_API_KEY_KAXANUK, KNAA_API_KEY_KAXANUK
+│   └── .env.template            # provider keys and the two engine licences; copy to .env
 ├── Bibliotheca/                 # step 1
-│   ├── BIBLIOGRAPHY.md          #   the index, grouped by the claim each source bears on
+│   ├── BIBLIOGRAPHY.md          #   the index, grouped by what a source bears on; the note convention
 │   ├── Papers/Author_Year_Title.md
 │   └── Books/Author_Year_Title/INDEX.md
 ├── Universe/                    # step 2
-│   ├── Investable_Universe.csv  #   THE SEED: point-in-time, delisted names retained, committed
-│   └── universe.ipynb           #   -> Security_Master.csv, Data_Issues.csv, Charts/  (gitignored)
+│   ├── Investable_Universe.csv  #   THE SEED, committed: main_identifier is the only required column
+│   └── universe.ipynb           #   -> Security_Master.csv, Data_Issues.csv (gitignored)
 ├── Data/                        # step 3
-│   ├── curator.py               #   Data Curator driver (live library)
+│   ├── curator.py               #   Data Curator driver
 │   ├── Curator/
-│   │   ├── custom_calculations.py   # c_* per-ticker columns
-│   │   ├── Time_Series/         #   downloaded, gitignored
-│   │   ├── Benchmarks/          #   supplied by hand: KN600.csv, index holdings, returns
-│   │   └── Factors/             #   supplied by hand: f_*.csv
-│   ├── refinery.py              #   hand-rolled; the seam the Data Refinery library replaces
+│   │   ├── custom_calculations.py   # c_* columns: one security's own history
+│   │   ├── Time_Series/         #   downloaded, gitignored — universe, cash proxy, benchmarks
+│   │   ├── Benchmarks/          #   dropped in by hand: index holdings and returns
+│   │   └── Factors/             #   dropped in by hand: factor-model returns
+│   ├── refinery.py              #   the seam the Data Refinery library replaces
 │   ├── Refinery/
-│   │   ├── custom_calculations.py   # r_* cross-sectional columns
-│   │   └── Time_Series/         #   derived, gitignored — what every experiment reads
-│   ├── analyzer.ipynb           #   hand-rolled; the shape the Data Analyzer library fills
+│   │   ├── custom_calculations.py   # r_* columns: cross-sectional or fitted
+│   │   └── Time_Series/         #   derived, gitignored — the panel every experiment reads
+│   ├── analyzer.ipynb           #   where a feature earns a backtest or is dropped
 │   └── Analyzer/                #   charts and the IC table, gitignored
 ├── Experiments/                 # steps 4-6
-│   ├── panel.py                 #   the one panel loader; names no strategy column
-│   ├── engine.py                #   the one path from a weight file to a number; benchmarks live here
+│   ├── securities_panel.py      #   the one panel loader; names no strategy column
+│   ├── portfolio_construction.py    # eligible set -> weights, one signature; the library's seam
+│   ├── backtest_engine.py       #   the one path from a weight file to a number
+│   ├── attribution_analysis.py  #   shaping the hand-supplied inputs; what is missing, first
 │   └── Experiment_N/
 │       ├── BLUEPRINT_N.md  BRAINSTORMING_N.md  JOURNAL_N.md  FINDINGS_N.md
 │       ├── experiment_N.ipynb
 │       ├── Portfolio/           #   step 4 output, gitignored
 │       ├── Backtest/            #   step 5 output, gitignored
 │       └── Attribution/         #   step 6 output, gitignored
-├── Paper_Trading/               # step 7
-│   ├── BITACORA.md              #   the graduation gate — a contract, not a log
-│   ├── daily_update.py          #   the scheduler over graduated books; contract as docstring
-│   └── Paper_Trading_N/paper_trading_N.py   # one frozen rule per graduated experiment
-└── .devcontainer/               # Docker: Python 3.13 serves Jupyter, uv-managed 3.14 runs notebooks
+└── Paper_Trading/               # step 7
+    ├── BITACORA.md              #   the graduation gate — a contract, not a log
+    ├── daily_update.py          #   the scheduler over graduated books; contract as docstring
+    └── Paper_Trading_N/paper_trading_N.py   # one frozen rule per graduated experiment
 ```
 
 ## What is committed, and what is not
 
 **Only source is committed:** code, notebooks with outputs stripped, documents, the folder skeleton
-kept by `.gitkeep`, and one seed file — `Universe/Investable_Universe.csv`. Everything under `Data/`
-except code, every `Portfolio/`, `Backtest/` and `Attribution/`, every chart, workbook, PDF and
-parquet is regenerated by running a stage or supplied by hand, and is gitignored by extension and by
-path. `Config/.env` is gitignored **because it is secret** — three real credentials — and never
-because it is merely machine-specific; the template is committed.
+kept by `.gitkeep`, `LICENSE`, and one seed file — `Universe/Investable_Universe.csv`. Everything
+under `Data/` except code, every `Portfolio/`, `Backtest/` and `Attribution/`, every chart, workbook,
+PDF and parquet is regenerated by running a stage or supplied by hand, and is gitignored by
+extension and by path. `Config/.env` is gitignored **because it is secret**; the template is
+committed. The AI setup — `.claude/`, `.agents/`, `apm_modules/`, `apm.yml`, `apm.lock.yaml`,
+`.mcp.json` — is gitignored too, and installed per machine by APM.
 
 Strip notebook outputs before committing:
 
@@ -68,27 +76,26 @@ uv run --group notebook jupyter nbconvert --clear-output --inplace Universe/univ
 
 ## Starting a strategy from the template
 
-Copy the template repository. Then, in this order — each step is the smallest change that makes the
-next one possible:
+Run the `start-a-strategy` prompt, which copies `main`, initialises APM and installs the KaxaNuk
+packages. Then, in this order:
 
-1. **Name it.** `name` in `pyproject.toml`; the kernel name and display name in
-   `.devcontainer/Dockerfile`; `name` and the service in `docker-compose.yml` and
-   `devcontainer.json`. Replace `<Strategy_Name>` wherever it appears in the documents.
-2. **State the idea** in `OBJECTIVE.md`. Every angle-bracketed slot is guidance; none survives.
-3. **Write the hypothesis** in `Experiments/Experiment_1/BLUEPRINT_1.md` — before the rule.
-4. **Compute the signal.** Add its `c_*` function to `Data/Curator/custom_calculations.py` and list
-   it in `CUSTOM_COLUMNS` in `Data/curator.py` (use the `data-curator-custom-calculations` skill).
-   Cross-sectional features go in `Data/Refinery/custom_calculations.py`.
-5. **Point the notebooks at it.** `SIGNAL_COLUMN` in `Universe/universe.ipynb`,
-   `ELIGIBILITY_COLUMN` and the feature lists in `Data/analyzer.ipynb`, `SIGNAL_COLUMN` and
-   `SIZING_COLUMN` in the experiment notebook's setup cell.
-6. **Write the rule** — section 2 of `experiment_1.ipynb`, the one cell that raises until you do.
-7. **Fill `Config/.env`** from the template; run `uv run python Data/curator.py --report` first, then
-   the curator, the refinery, and the notebooks in pipeline order.
+1. **Put the securities in `Universe/Investable_Universe.csv`.** One row each; `main_identifier` is
+   the only required column. Add whatever else the strategy groups by.
+2. **Write `OBJECTIVE.md`** — the idea, and the claims inside it, before anything is measured. Every
+   angle-bracketed slot is guidance; none survives.
+3. **Write the `c_*` and `r_*` columns** into the two `custom_calculations.py`, and fill in the
+   Curator and Refinery drivers that call the libraries.
+4. **Run steps 2 and 3 in order:** curator, `universe.ipynb`, refinery, `analyzer.ipynb`.
+5. **Write `BLUEPRINT_1.md` before the rule.** A hypothesis edited after its test is not a
+   hypothesis.
+
+The template's benchmark rule — hold everything the signal calls eligible, equally weighted, cash for
+the rest — is described in section 2 of the notebook and is the first thing to implement, because a
+benchmark you have to write before you can measure anything is a benchmark that never gets written.
 
 ## Adding Experiment N to an existing strategy
 
-From the repository root, bash:
+From the repository root:
 
 ```bash
 N=2
@@ -99,7 +106,7 @@ done
 ```
 
 Then copy the four templates from this skill's `references/` into `$base/`, renaming `N`, and copy
-`blueprint-notebook.ipynb` to `$base/experiment_$N.ipynb`. In the notebook: replace the inline panel
-loading in section 1 with `panel.load_company_panel(REFINERY_DIR, UNIVERSE_PATH, columns=...)`,
-declare the experiment's columns in section 0, and write the rule in section 2. **`BLUEPRINT_N.md`
-is written before the rule**, and does not change afterwards.
+`experiment-notebook.ipynb` to `$base/experiment_$N.ipynb`. In the notebook: declare the
+experiment's columns in section 0, import the panel loader from `Experiments/securities_panel.py` in
+section 1, write the rule in section 2. **`BLUEPRINT_N.md` is written before the rule**, and does not
+change afterwards.

@@ -1,6 +1,6 @@
 name: kaxanuk-apm-investment-lab
-version: 0.2.0
-description: APM skills for KaxaNuk Investment Lab research — the KN Research Process document architecture, experiment lifecycle, and alpha decomposition
+version: 0.3.0
+description: APM primitives for KaxaNuk Investment Lab strategy repositories — the KN Research Process, the experiment lifecycle, alpha decomposition in two layers, and the start-a-strategy prompt
 author: Arturo Aguilar
 dependencies:
   apm: []
