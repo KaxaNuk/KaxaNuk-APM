@@ -85,3 +85,13 @@ Install the APM dev dependencies:
 ```bash
 apm install --dev
 ```
+
+Run the unit tests of the skill scripts:
+```bash
+pytest
+```
+
+Check the repo's own Python against the Bloom Code style guide:
+```bash
+python common/.apm/skills/bloom-code-lint/scripts/bloom_code_check.py common tests --local-package bloom_code_check --local-package propagate_mcp_env_vars
+```
