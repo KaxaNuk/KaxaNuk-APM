@@ -508,6 +508,18 @@ class TestCheckOneItemPerLine:
 
         assert result == expected
 
+    def test_type_parameter_list_inside_subscript_is_allowed(self) -> None:
+        source = '''
+            Handler = typing.Callable[[str, int], bool]
+        '''
+        result = codes_for(
+            check_one_item_per_line,
+            source,
+        )
+        expected = []
+
+        assert result == expected
+
 
 class TestCheckTypeHints:
     def test_missing_parameter_hint_is_reported(self) -> None:
