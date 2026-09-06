@@ -2,22 +2,34 @@
 description: Python Bloom Code Style Guide
 applyTo: "**/*.py"
 metadata:
-  version: 2.0.0
+  version: 2.1.0
 ---
 # Python "Bloom Code" Style Guide
 Strict superset of PEP 8 whose single objective is reading speed for someone unfamiliar with the codebase.
 The mechanical part is enforced by a script (see below); this file keeps only what needs judgment.
 
 ## Judgment rules
+Each rule ends with how to verify it; a rule you cannot verify is a rule you did not apply.
 - Organize predictably: group declarations by a shared characteristic, then alphabetically within each group.
     This applies to constants, class attributes, dict literals and import blocks, not only to functions.
+    Verification: read each block top to bottom; every adjacent pair belongs to the same group and is in
+    alphabetical order.
 - No abbreviations, acronyms, aliases or mnemonics. A name says what the thing is.
+    Verification: grep the changed files for identifiers of 5 characters or fewer and for runs of capital
+    letters; every hit is a whole English word or gets renamed.
 - One concept per variable: bind a new name instead of overwriting an existing one, so every intermediate
     value stays inspectable while debugging.
+    Verification: the checker's BLOOM006 passes, and a name bound in several `if`/`elif`/`else` branches
+    means the same concept in every branch.
 - Return a single value. If a function needs several, first try splitting it into functions that return one value
     each; if that is infeasible, return a dataclass (fixed attributes) or a dict (dynamic keys), never a tuple.
+    Verification: BLOOM007 passes, and no function returns a dict whose keys are known in advance (that is a
+    dataclass).
 - Use line breaks to separate logical concepts inside a statement and reduce visual clutter.
+    Verification: no physical line carries two logical steps; BLOOM010 and BLOOM012 pass.
 - Type-hinted functions do not repeat parameter or return types in the docstring.
+    Verification: grep docstrings for `:type`, `:rtype`, `Args:` blocks with parenthesized types and
+    `Returns:` lines that name a type; none appear inside a type-hinted function.
 
 ## Mechanical rules
 Before reporting Python work as done, run the Bloom Code checker on every file you touched and fix each reported
