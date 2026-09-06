@@ -77,7 +77,9 @@ uv run --group notebook jupyter nbconvert --clear-output --inplace Universe/univ
 ## Starting a strategy from the template
 
 Run the `start-a-strategy` prompt, which copies `main`, initialises APM and installs the KaxaNuk
-packages. Then, in this order:
+packages — all of it into **one folder**, the strategy root, with `.claude/`, `apm_modules/`,
+`apm.yml` and `.venv/` beside the process folders rather than in a directory above them. Then, in
+this order:
 
 1. **Put the securities in `Universe/Investable_Universe.csv`.** One row each; `main_identifier` is
    the only required column. Add whatever else the strategy groups by.

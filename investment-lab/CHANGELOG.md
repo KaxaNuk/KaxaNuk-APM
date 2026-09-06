@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-09-05
+### Changed
+- `start-a-strategy` sets the strategy up **in** the folder it is pointed at, instead of creating a
+  folder inside it. `destination` is now the root itself; both copy forms clone into `.`, so the
+  process folders and the AI setup — `.claude/`, `apm_modules/`, `apm.yml`, `.venv/` — end up side
+  by side in one place, and the user opens that place. A non-empty destination still gets a
+  `${strategy_name}` folder, and the prompt says so rather than doing it silently.
+- The prompt refuses to continue when the destination already holds `apm.yml`, `apm_modules/`,
+  `.claude/` or `requirements-dev.txt` without a template beside them. That is the wrapper folder
+  the old flow produced: two `apm.yml` files and two `.claude/` directories, of which an agent
+  opened at the outer level reads the empty one and never sees the research tree.
+- The environment step is `uv sync`, not `uv sync --group dev` — `dev` is a default group — and the
+  prompt now says why it comes before `apm init`: `apm-cli` arrives with it.
+- Step order renumbered to six, with the root decided in its own step before anything is copied, and
+  the target layout drawn at the top of the prompt so every later step can point at it.
+
 ## [0.3.0] - 2026-09-05
 ### Added
 - `start-a-strategy` prompt: copies `main` of the public KN Research Process template

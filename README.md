@@ -49,6 +49,13 @@ packages below:
 Please run the prompt at https://github.com/KaxaNuk/KaxaNuk-APM/investment-lab/.apm/prompts/start-a-strategy.prompt.md with strategy_name=<your strategy>
 ```
 
+Add `destination=<a folder>` to say where. **It sets the strategy up *in* that folder, not in
+one created inside it**, so point it at an empty folder: that folder becomes the whole project,
+with the process folders and the AI setup — `.claude/`, `apm_modules/`, `apm.yml`, `.venv/` —
+beside each other in it, and it is the folder you open afterwards. A destination that already holds
+an `apm.yml` or a `.claude/` is refused, because two setups in a stack means the outer, empty one is
+the one an agent reads.
+
 The template's `README.md` then says what to fill in, in order. A **researcher** — a companion you
 name and teach, which reads a strategy's `Bibliotheca/` and drafts the hypothesis in each blueprint
 — is a separate project at `KaxaNuk/KaxaNuk-Researcher`.
