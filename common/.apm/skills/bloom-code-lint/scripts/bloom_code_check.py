@@ -1419,6 +1419,39 @@ def _is_import_statement(node: ast.AST) -> bool:
     )
 
 
+def _is_inside_subscript(
+    node: ast.AST,
+    parents: dict[int, ast.AST],
+) -> bool:
+    """
+    True when the node is a subscript slice or a list/tuple nested inside one (type parameters).
+    """
+    node_id = id(node)
+    parent = parents.get(node_id)
+
+    if parent is None:
+        return False
+
+    if _is_subscript(parent):
+        return True
+
+    is_nested_literal = isinstance(
+        parent,
+        (
+            ast.List,
+            ast.Tuple,
+        ),
+    )
+
+    if not is_nested_literal:
+        return False
+
+    return _is_inside_subscript(
+        parent,
+        parents,
+    )
+
+
 def _is_load_context(node: ast.AST) -> bool:
     """
     True when an expression node is read rather than assigned to.
@@ -1786,32 +1819,38 @@ def _multi_item_children(
 
     if isinstance(
         node,
-        (
-            ast.List,
-            ast.Set,
-        ),
-    ):
-        return node.elts
-
-    if isinstance(
-        node,
         ast.Dict,
     ):
         return _dict_items(node)
 
-    if _is_tuple(node):
-        node_id = id(node)
-        parent = parents.get(node_id)
-        in_subscript = _is_subscript(parent)
-        is_loaded = _is_load_context(node)
-        is_excluded = in_subscript or not is_loaded
-
-        if is_excluded:
-            return []
-
+    if isinstance(
+        node,
+        ast.Set,
+    ):
         return node.elts
 
-    return []
+    is_sequence_literal = isinstance(
+        node,
+        (
+            ast.List,
+            ast.Tuple,
+        ),
+    )
+
+    if not is_sequence_literal:
+        return []
+
+    in_subscript = _is_inside_subscript(
+        node,
+        parents,
+    )
+    is_loaded = _is_load_context(node)
+    is_excluded = in_subscript or not is_loaded
+
+    if is_excluded:
+        return []
+
+    return node.elts
 
 
 def _name_nodes(target: ast.AST) -> list[ast.Name]:
