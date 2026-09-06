@@ -1,0 +1,57 @@
+{
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python \"${PLUGIN_ROOT}/.apm/hooks/scripts/bootstrap_context.py\"",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python \"${PLUGIN_ROOT}/.apm/hooks/scripts/context_size_check.py\"",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "SubagentStop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python \"${PLUGIN_ROOT}/.apm/hooks/scripts/subagent_capture.py\"",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "SessionEnd": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python \"${PLUGIN_ROOT}/.apm/hooks/scripts/session_end_log.py\"",
+          "timeout": 10
+        }
+      ]
+    }
+  ],
+  "PreCompact": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python \"${PLUGIN_ROOT}/.apm/hooks/scripts/precompact_log.py\"",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

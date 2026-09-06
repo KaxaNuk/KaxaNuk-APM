@@ -1,0 +1,9 @@
+name: kaxanuk-apm-context-system
+version: 0.1.0
+description: docs/context working memory for KaxaNuk projects - on-demand instruction, size-capping hooks, /compact-context
+author: Rinku Kazeno
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}
