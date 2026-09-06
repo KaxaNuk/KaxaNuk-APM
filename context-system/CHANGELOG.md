@@ -14,3 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hooks (Python, stdlib only): `SessionStart` bootstrap, `UserPromptSubmit` size check (`--caps` prints the
   table), `SubagentStop` capture gated on a non-empty `agent_type`, `SessionEnd` daily stub, `PreCompact`
   marker. Every hook exits 0 and is a no-op when `docs/context/` is absent.
+
+### Verified
+- `apm install` (apm-cli 0.29.0) into a Claude-target project on 2026-09-05: hooks merged into
+  `.claude/settings.json` with commands anchored on `${CLAUDE_PROJECT_DIR}/.claude/hooks/context-system/...`,
+  script bundle deployed with its sibling module, instruction deployed as `.claude/rules/context-system.md`,
+  prompt deployed as `.claude/commands/compact-context.md`. All five hooks ran with synthetic payloads: bootstrap
+  created five stubs then stayed silent, size check silent under cap and loud over cap, subagent capture wrote
+  zero lines for an ambient payload and one line (accents intact) for a real one, session end wrote one stub
+  per day, precompact wrote its marker, invalid stdin exited 0.
