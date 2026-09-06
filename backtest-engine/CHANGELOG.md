@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-09-06
+### Fixed
+- The `backtest-engine-runs` description fits the 1024-character ceiling a Claude skill's
+  description has. It was 1060, so the tail — the "does NOT cover" clauses that keep the engine
+  skill from being loaded for a research-process question — was the part at risk of being cut.
+### Changed
+- The description points at `attribution-analysis-runs` for running the attribution library, now
+  that the package exists.
+
 ## [0.1.1] - 2026-09-06
 ### Fixed
 - The licence key is `KNBE_API_KEY_KAXANUK`, the name KaxaNuk actually uses and the one the KN

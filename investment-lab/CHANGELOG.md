@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-09-06
+### Changed
+- `alpha-decomposition` names `attribution-analysis-runs` as the skill that shapes the attribution
+  library's inputs and calls it. This skill still reads numbers rather than producing them; now it
+  says where they come from.
+- Its third pass no longer hedges on whether the library can run Brinson-Fachler on residual
+  returns. It cannot, so the instruction is to build the residual series from the factor model's
+  output — and the two spellings of that residual, `f_idio_returns` and `idio_returns`, are named,
+  because they are not interchangeable.
+
 ## [0.4.1] - 2026-09-06
 ### Fixed
 - `references/structure.md` shows the template's real Python range, `>=3.12,<3.14`, not `>=3.14`.

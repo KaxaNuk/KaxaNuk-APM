@@ -6,15 +6,14 @@ description: >
   files, shape a portfolio weight file or market-data files for it, fill in
   `backtest_engine_parameters.xlsx`, call `PyArrowBacktester` or the `kaxanuk.backtest_engine` CLI,
   attach a commission or slippage model, add a benchmark, or read the returned tables and the Excel
-  report (CAGR, Sharpe, Sortino, VaR, CVaR, drawdown, annual returns, weights). It covers the two
-  inputs the engine reads and the exact layouts it detects, the licence and its environment
-  variable, and how the engine is called from inside a KN Research Process repository. It does NOT
-  cover the research process, the experiment documents or the notebook contract (use
-  `experiment-lifecycle` from the `investment-lab` package), reading attribution output into
-  selection, sizing and timing (use `alpha-decomposition`), or authoring Data Curator `c_*` columns
-  (use `data-curator-custom-calculations`).
+  report (CAGR, Sharpe, Sortino, VaR, CVaR, drawdown, annual returns). It covers the two inputs the
+  engine reads and the layouts it detects, the licence and its environment variable, and how the
+  engine is called from a KN Research Process repository. It does NOT cover the research process or
+  the notebook contract (use `experiment-lifecycle`), running the attribution library (use
+  `attribution-analysis-runs`), reading attribution output (use `alpha-decomposition`), or authoring
+  Data Curator `c_*` columns (use `data-curator-custom-calculations`).
 metadata:
-  version: 0.1
+  version: 0.1.2
 ---
 
 # Running the KaxaNuk Backtest Engine

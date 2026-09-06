@@ -8,9 +8,10 @@ description: >
   selection, sizing and timing by building counterfactual books the Backtest Engine can price, to
   run the exclusion-filter test when the factor model is blind to an absolute rule, and to evidence
   graduation criterion 2. It does NOT run the engine or the attribution library for you — it says
-  which books to price and how to read the numbers that come back.
+  which books to price and how to read the numbers that come back. Shaping the attribution library's
+  inputs and calling it is `attribution-analysis-runs`; pricing a book is `backtest-engine-runs`.
 metadata:
-  version: 0.2
+  version: 0.2.1
 ---
 
 # Alpha decomposition — is the signal doing anything?
@@ -43,9 +44,11 @@ Run both methodologies (the experiment notebook's attribution cell does this) an
 
 The third pass is what the first cut alone cannot give: a book that looks like skilful stock-picking
 in Brinson-Fachler can be a persistent low-beta or momentum tilt that happened to pay over the
-sample. If the attribution library does not run Brinson-Fachler on residual returns directly, build
-the residual series from the factor model's output and run the first cut on it in the notebook —
-and say in `FINDINGS_N.md` that it was done that way.
+sample. The attribution library does not run Brinson-Fachler on residual returns directly, so build
+the residual series from the factor model's output — `calc_pct_area()` names it `f_idio_returns`,
+`cummulative_pct_decomp()` names it `idio_returns` — and run the first cut on it in the notebook,
+saying in `FINDINGS_N.md` that it was done that way. Getting those tables out at all is
+`attribution-analysis-runs`.
 
 Two readings, both of which count as answers:
 
