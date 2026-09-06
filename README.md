@@ -5,6 +5,35 @@ To use it you must first install APM, and then add as an APM dependency the pack
 
 ---
 
+## Catalog
+Each subfolder with an `apm.yml` is a package. What each one ships:
+
+### `common` (dev conventions for every KaxaNuk Python repo)
+| Primitive | Type | Fires on | Purpose |
+|---|---|---|---|
+| `filesystem-boundaries` | instruction | every file | Only read well-defined locations outside the project |
+| `python-bloom-code` | instruction | `**/*.py` | Bloom Code judgment rules + order to run the checker |
+| `python-pep8` | instruction | `**/*.py` | Points where this project is stricter than PEP 8 |
+| `python-test-writing` | instruction | `**/tests/**/*.py` | Unit test folder and file structure |
+| `initialize-apm` | prompt | `/initialize-apm` | Install and initialize APM in a repo |
+| `apm-usage` | skill | any APM task | Pointer to the APM docs |
+| `bloom-code-lint` | skill | after writing Python | Deterministic checker for the mechanical Bloom rules |
+| `devcontainer-aware-command-execution` | skill | before any shell command | Run inside the devcontainer when it is up |
+| `propagate-mcp-env-vars` | skill | MCP 401/403 with `${VAR}` URLs | Resolve `.env` references into `.mcp.json` |
+
+### `context-system` (working memory in `docs/context/`)
+| Primitive | Type | Fires on | Purpose |
+|---|---|---|---|
+| `context-system` | instruction | every file | Read `docs/context/` on demand; task management; hard caps |
+| `compact-context` | prompt | `/compact-context` | Snapshot and hard-compact over-cap files |
+| `bootstrap_context` | hook | `SessionStart` | Create missing `docs/context/` stubs |
+| `context_size_check` | hook | `UserPromptSubmit` | Warn when a file is over cap (`--caps` prints the table) |
+| `subagent_capture` | hook | `SubagentStop` | Append a real subagent's final line to `results.md` |
+| `session_end_log` | hook | `SessionEnd` | Daily stub in `session-log.md` when the model wrote none |
+| `precompact_log` | hook | `PreCompact` | Compaction marker in `session-log.md` |
+
+---
+
 ## Installing APM
 You can use the either the automated or manual way to install APM.
 
@@ -46,6 +75,10 @@ Each subfolder in this repo containing an `apm.yml` file is its own APM package.
 For example, to add the `common` package to your project:
 ```bash
 apm install KaxaNuk/KaxaNuk-APM/common
+```
+Or the working-memory package:
+```bash
+apm install KaxaNuk/KaxaNuk-APM/context-system
 ```
 
 ### Pick and mix
