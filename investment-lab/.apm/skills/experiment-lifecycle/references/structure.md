@@ -18,7 +18,7 @@ Template version: **0.4.0**. On `main` every file is a description of what is ex
 ├── CLAUDE.md                    # one line: @AGENTS.md
 ├── README.md                    # what it is, the eight steps, where each kind of logic goes
 ├── LICENSE                      # MIT
-├── pyproject.toml               # Python >=3.14, uv-managed; licensed engines deliberately absent
+├── pyproject.toml               # Python >=3.12,<3.14, uv-managed; licensed engines absent
 ├── Config/
 │   └── .env.template            # provider keys and the two engine licences; copy to .env
 ├── Bibliotheca/                 # step 1

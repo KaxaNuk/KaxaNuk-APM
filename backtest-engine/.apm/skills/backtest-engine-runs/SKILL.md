@@ -48,14 +48,16 @@ Three rules, and the first is not negotiable:
   it back. An exposed key is rotated, not edited out.
 - **Never add the engine to a repository's dependency file.** It is installed by hand, per machine,
   by whoever holds the licence.
-- **Check the supported Python before assuming it installs into an existing environment.** The
-  documentation states Python 3.12 or 3.13. A project pinned above that range needs a separate
-  interpreter for the engine — report the mismatch rather than quietly pinning around it.
+- **Python 3.12 or 3.13**, per the documentation. That ceiling is the engine's, and it is why a KN
+  Research Process repository pins `requires-python = ">=3.12,<3.14"` and installs 3.13: the Data
+  Curator allows up to 3.14 and the engine does not, so 3.13 is the version that satisfies both. A
+  project pinned above the range needs a separate interpreter for the engine — report the mismatch
+  rather than quietly pinning around it.
 
-The licence key lives in `Config/.env`. The engine's quick start names it `KNPC_API_KEY_KAXANUK`; a
-repository created from the KN Research Process template ships a `Config/.env.template` naming
-`KNBE_API_KEY_KAXANUK`. **Confirm which one this build reads, against the licence email, before
-filling anything in** — and report the answer without printing the value of either.
+The licence key lives in `Config/.env` as **`KNBE_API_KEY_KAXANUK`**. That is the name KaxaNuk uses,
+and it is what a repository created from the KN Research Process template ships in
+`Config/.env.template`. The engine's published quick start still shows an older
+`KNPC_API_KEY_KAXANUK`; treat that spelling as stale. **Never print the value of either.**
 
 ## 2. Guard the import, always
 

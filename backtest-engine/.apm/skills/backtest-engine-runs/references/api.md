@@ -146,4 +146,4 @@ component pages before calling them; do not infer a signature from the name.**
 | Market data | `{TICKER}.csv` or `{TICKER}.parquet`; a date column plus at least three price columns, roles mapped in the configuration |
 | Dates | `YYYY-MM-DD` |
 | Configuration | `Config/backtest_engine_parameters.xlsx`, or a dict or YAML in code |
-| Licence | `Config/.env` — the quick start names `KNPC_API_KEY_KAXANUK`; confirm against the licence email |
+| Licence | `Config/.env` — `KNBE_API_KEY_KAXANUK`. The published quick start still shows an older `KNPC_API_KEY_KAXANUK`; that spelling is stale |
