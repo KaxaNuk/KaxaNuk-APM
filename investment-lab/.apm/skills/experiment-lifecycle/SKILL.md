@@ -27,9 +27,9 @@ and a CIO reads the whole state of a project from two files, `OBJECTIVE.md` and 
 
 Work in English: notebook narrative, documents, function names and comments.
 
-**To start a new strategy, copy the template; never scaffold one by hand.** Run the
-`start-a-strategy` prompt in this package, or use *Use this template* on GitHub. To work inside one,
-follow this skill. `references/structure.md` has the tree, what is committed, and the steps to fill
+**To start a new strategy, copy the template; never scaffold one by hand.** Use *Use this template*
+on GitHub and follow the template's own `SETUP.md`, which owns that procedure. To work inside a
+strategy repository, follow this skill. `references/structure.md` has the tree, what is committed, and the steps to fill
 it in. **Do not name Obsidian, a deck, or any KaxaNuk in-house strategy in a repository document.**
 
 ## 1. The eight steps
@@ -151,8 +151,8 @@ nothing to tune — stay in the Curator.
 
 ## 6. Scaffolding
 
-**A new strategy.** Run the `start-a-strategy` prompt (copies the template, initialises APM,
-installs the KaxaNuk packages), then in this order — each step the smallest change that makes the
+**A new strategy.** Follow the template's `SETUP.md` (get the repository, `uv sync`, the credential
+file, and the agent skills if wanted), then in this order — each step the smallest change that makes the
 next one possible:
 
 1. Put the securities in `Universe/Investable_Universe.csv`; `main_identifier` is the only required

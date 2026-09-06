@@ -41,20 +41,18 @@ Please run the command that you can find in https://github.com/KaxaNuk/KaxaNuk-A
 
 ## Starting an investment strategy
 
-The fastest way in. Give this prompt to your AI assistant, and it copies the public **KN Research
-Process template** (`KaxaNuk/KaxaNuk-Research-Process`), initialises APM and installs the three
-packages below:
+Strategies are built from the public **KN Research Process template**,
+[`KaxaNuk/KaxaNuk-Research-Process`](https://github.com/KaxaNuk/KaxaNuk-Research-Process). **The
+template owns its own setup** — how to create the repository, the one folder it has to live in, and
+the commands — in its `SETUP.md`. Give this to your AI assistant:
 
 ```text
-Please run the prompt at https://github.com/KaxaNuk/KaxaNuk-APM/investment-lab/.apm/prompts/start-a-strategy.prompt.md with strategy_name=<your strategy>
+Please follow https://github.com/KaxaNuk/KaxaNuk-Research-Process/blob/main/SETUP.md
 ```
 
-Add `destination=<a folder>` to say where. **It sets the strategy up *in* that folder, not in
-one created inside it**, so point it at an empty folder: that folder becomes the whole project,
-with the process folders and the AI setup — `.claude/`, `apm_modules/`, `apm.yml`, `.venv/` —
-beside each other in it, and it is the folder you open afterwards. A destination that already holds
-an `apm.yml` or a `.claude/` is refused, because two setups in a stack means the outer, empty one is
-the one an agent reads.
+A repository created from the template already carries an `apm.yml` naming the packages below, so
+installing them there is a bare `apm install` from its root — and `SETUP.md` asks whether you want
+them rather than assuming, because nothing in that pipeline imports a skill.
 
 The template's `README.md` then says what to fill in, in order. A **researcher** — a companion you
 name and teach, which reads a strategy's `Bibliotheca/` and drafts the hypothesis in each blueprint
@@ -76,13 +74,19 @@ You can check the available targets at
 
 ### Add a specific package
 
-Each subfolder in this repo containing an `apm.yml` file is its own APM package:
+Each subfolder in this repo containing an `apm.yml` file is its own APM package. **They are split
+by audience, not by convenience:** somebody who licenses only one library installs that library's
+package and nothing else, so a library skill never drags a research process in behind it. How to
+*call* a library lives in that library's package; judgment about a strategy lives in
+`investment-lab`.
 
 | Package | Contents |
 |---|---|
 | `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
-| `investment-lab` | Primitives for strategy repositories built from the KN Research Process template: `experiment-lifecycle` (the eight steps, the document architecture, the notebook contract, the restrictions and the gate), `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books), and the `start-a-strategy` prompt. |
+| `backtest-engine` | Primitives for projects built on the KaxaNuk Backtest Engine: installing the licensed package without leaking its key, the two inputs it reads and the layouts it detects, the CLI and `PyArrowBacktester`, and reading the metrics back. |
+| `investment-lab` | Primitives for working inside a strategy repository built from the KN Research Process template: `experiment-lifecycle` (the eight steps, the document architecture, the notebook contract, the restrictions and the gate) and `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books). Getting the repository in the first place is the template's own `SETUP.md`. |
+| `kaxanuk` | All of the above under one name. The in-house case, where every Investment Lab library is used; install a single package instead if you use one library. |
 
 For example, to add the `common` package to your project:
 

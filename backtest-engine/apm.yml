@@ -1,0 +1,9 @@
+name: kaxanuk-apm-backtest-engine
+version: 0.1.0
+description: APM primitives for projects built on the KaxaNuk Backtest Engine — installing the licensed package, shaping its two inputs, running it and reading the results back
+author: Arturo Aguilar
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

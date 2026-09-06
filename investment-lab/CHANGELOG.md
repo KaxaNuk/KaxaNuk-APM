@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-09-06
+### Removed
+- The `start-a-strategy` prompt. It moved to the KN Research Process template as `SETUP.md`, on the
+  rule that **the instruction to install a thing belongs with that thing**. A bootstrap held in an
+  APM package could only be reached by pasting a raw GitHub URL at an assistant — you had to install
+  APM to find out how to install anything — and that is the step that broke outside Claude. The
+  template now owns creating the repository, the one folder it lives in, and the commands, and it
+  asks whether to install these packages rather than assuming.
+### Changed
+- The package is now scoped to **working inside a strategy repository that already exists**:
+  `experiment-lifecycle` and `alpha-decomposition`. `apm.yml`'s description says so.
+- `experiment-lifecycle` and its `references/structure.md` point at the template's `SETUP.md` for
+  scaffolding instead of at the removed prompt.
+
 ## [0.3.1] - 2026-09-05
 ### Changed
 - `start-a-strategy` sets the strategy up **in** the folder it is pointed at, instead of creating a
