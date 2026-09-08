@@ -1,0 +1,9 @@
+name: kaxanuk-apm-attribution-analysis
+version: 0.1.0
+description: APM primitives for projects built on the KaxaNuk Attribution Analysis library — shaping its four inputs, running Brinson-Fachler and the factor model, and reading the tables back
+author: Arturo Aguilar
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

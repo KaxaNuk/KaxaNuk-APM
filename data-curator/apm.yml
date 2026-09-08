@@ -1,0 +1,9 @@
+name: kaxanuk-apm-data-curator
+version: 0.2.0
+description: APM project for KaxaNuk Data Curator system uses
+author: Rinku Kazeno
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}
