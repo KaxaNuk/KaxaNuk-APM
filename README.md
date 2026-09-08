@@ -44,15 +44,18 @@ Please follow https://github.com/KaxaNuk/KaxaNuk-APM/blob/main/common/.apm/promp
 Strategies are built from the public **KN Research Process template**,
 [`KaxaNuk/KaxaNuk-Research-Process`](https://github.com/KaxaNuk/KaxaNuk-Research-Process). **The
 template owns its own setup** — how to create the repository, the one folder it has to live in, and
-the commands — in its `SETUP.md`. Give this to your AI assistant:
+the commands — in its `SETUP.md`. Give this to your AI assistant, and it asks you for the strategy's
+name and does the rest:
 
 ```text
-Please follow https://github.com/KaxaNuk/KaxaNuk-Research-Process/blob/main/SETUP.md
+Please help install https://github.com/KaxaNuk/KaxaNuk-Research-Process
 ```
 
-A repository created from the template already carries an `apm.yml` naming the packages below, so
-installing them there is a bare `apm install` from its root — and `SETUP.md` asks whether you want
-them rather than assuming, because nothing in that pipeline imports a skill.
+A repository created from the template already carries an `apm.yml` naming the `kaxanuk` package
+below — every package here under one name — so installing the skills there is
+`uv run apm install --target claude` (or `--target codex`) from its root, with nothing to type.
+When the request already asked for the skills, the agent installs them; when it only asked for the
+repository, it asks first — nothing in that pipeline imports a skill, so *no* is a real answer.
 
 The template's `README.md` then says what to fill in, in order. A **researcher** — a companion you
 name and teach, which reads a strategy's `Bibliotheca/` and drafts the hypothesis in each blueprint
