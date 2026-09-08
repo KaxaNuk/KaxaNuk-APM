@@ -40,7 +40,7 @@ It enforces: no nested functions; no import aliases; `from x import y` only for 
 `import module` + qualified names); no `from __future__`; names of at least 3 characters; no variable reassignment;
 no tuple returns; no implicit string concatenation (use `join`); declaration order (module: public then internal;
 class: abstract, `__init__`, properties public/protected/private, methods public/protected/private; alphabetical
-within each block); one item per line in any construct with 2+ comma-separated items; one call per line; type
-hints on every parameter and return; exception message in an intermediate variable before `raise`; parenthesized
+within each block); one item per line in any construct with 3+ comma-separated items (2 when the line is over
+the project's length limit); at most one nested call per line; type hints on every parameter and return; exception message in an intermediate variable before `raise`; parenthesized
 tuples; a blank line before `return`/`yield`/`raise` and around blocks that contain one; comprehensions split
 across lines; multiline docstring summary starting on its own line.

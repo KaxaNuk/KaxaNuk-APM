@@ -24,7 +24,9 @@ Output is ASCII only.
    ```
    Local application packages are detected automatically (packages and modules directly under the working
    directory or under `src/`). If a package lives elsewhere, declare it so its `from x import y` imports are
-   accepted: `--local-package <name>` (repeatable).
+   accepted: `--local-package <name>` (repeatable). `--max-line-length N` (default 120) sets the line length
+   above which two comma-separated items must split; `--strict` restores the literal reading of BLOOM010 and
+   BLOOM012 (see the table).
 2. Fix every reported line. The message says what to change; the rule table below says why.
 3. Re-run until the checker prints `[ok]`. Only then report the Python work as done.
 
@@ -42,9 +44,9 @@ Do not "fix" a violation by disabling or editing the checker.
 | BLOOM007 | Function returns a tuple | Split into single-value functions, or return a dataclass or dict |
 | BLOOM008 | Implicit string concatenation | Use `str.join` |
 | BLOOM009 | Declaration out of order | Module: public then internal. Class: abstract, `__init__`, properties (public, protected, private), methods (public, protected, private). Alphabetical within each block |
-| BLOOM010 | Construct with 2+ comma-separated items on one line | One item per line, none on the opening line (calls, parameters, lists, tuples, sets, dicts, `from` imports) |
+| BLOOM010 | Comma-separated items sharing a line: 3+ items, or 2 items on a line over `--max-line-length` (`--strict`: from 2 items) | One item per line, none on the opening line (calls, parameters, lists, tuples, sets, dicts, `from` imports) |
 | BLOOM011 | Missing type hint on a parameter or return (`self`/`cls` exempt) | Annotate it |
-| BLOOM012 | More than one call on a line | Each nested call on its own line |
+| BLOOM012 | More than one nested call on a line: `f(g(h(x)))` fires, `len(x.split())` does not (`--strict`: any nested call) | Each nested call on its own line |
 | BLOOM013 | `raise` with an inline message | Assign the message to a variable (for example `msg`) first |
 | BLOOM014 | Tuple literal without parentheses (unpacking targets and subscripts exempt) | Parenthesize it |
 | BLOOM015 | `return`/`yield`/`raise` without a blank line before it, or a block containing one without blank lines around it (a leading docstring does not count as preceding code) | Add the blank line |

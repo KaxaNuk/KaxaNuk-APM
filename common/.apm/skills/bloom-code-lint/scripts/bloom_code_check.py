@@ -5,7 +5,11 @@ Mechanically verifies the lintable subset of the KaxaNuk "Bloom Code" style guid
 and prints one line per violation with a remediation hint. Console output is ASCII only.
 
 Usage:
-    python bloom_code_check.py <path> [<path> ...] [--local-package NAME ...]
+    python bloom_code_check.py <path> [<path> ...] [--local-package NAME ...] [--strict] [--max-line-length N]
+
+Two rules are read with a threshold by default: BLOOM010 (one item per line) fires from three
+comma-separated items, or from two when the line is longer than --max-line-length; BLOOM012 (one call
+per line) allows a single nested call. --strict restores the literal reading of both.
 
 Exit code 0 when every file is clean, 1 when any violation was found.
 """
@@ -46,6 +50,11 @@ COMPREHENSION_TYPES = (
     ast.ListComp,
     ast.SetComp,
 )
+DEFAULT_MAXIMUM_LINE_LENGTH = 120
+LENIENT_MAXIMUM_CALLS_PER_LINE = 2
+LENIENT_MINIMUM_ITEMS_FOR_SPLIT = 3
+STRICT_MAXIMUM_CALLS_PER_LINE = 1
+STRICT_MINIMUM_ITEMS_FOR_SPLIT = 2
 DOCUMENTED_NODE_TYPES = (
     ast.AsyncFunctionDef,
     ast.ClassDef,
@@ -78,9 +87,9 @@ RULE_MESSAGES = {
     'BLOOM007': 'function returns a tuple; split into single-value functions or return a dataclass or dict',
     'BLOOM008': 'implicit string concatenation; use str.join instead',
     'BLOOM009': 'declaration out of order; blocks are public then internal (methods: abstract, __init__, properties public/protected/private, methods public/protected/private), alphabetical within each block',
-    'BLOOM010': 'construct with 2+ comma-separated items on one line; put each item on its own line',
+    'BLOOM010': 'comma-separated items sharing a line (3+ items, or 2 on a line over the length limit); put each item on its own line',
     'BLOOM011': 'missing type hint on a parameter or on the return value',
-    'BLOOM012': 'more than one call on a line; put each nested call on its own line',
+    'BLOOM012': 'more than one nested call on a line; put each nested call on its own line',
     'BLOOM013': 'raise with an inline message; assign the message to a variable (for example msg) first',
     'BLOOM014': 'tuple without parentheses; always parenthesize tuples',
     'BLOOM015': 'return/yield/raise, or a block containing one, without the required blank line before or after it',
@@ -169,6 +178,9 @@ class SourceContext:
     filename: str
     lines: tuple[str, ...]
     local_packages: frozenset[str]
+    maximum_calls_per_line: int
+    maximum_line_length: int
+    minimum_items_for_split: int
     source: str
     tree: ast.Module
 
@@ -180,6 +192,8 @@ def build_context(
     source: str,
     filename: str,
     local_packages: frozenset[str],
+    strict: bool = False,
+    maximum_line_length: int = DEFAULT_MAXIMUM_LINE_LENGTH,
 ) -> SourceContext:
     """
     Parse source into the context shared by every rule. Raises SyntaxError on invalid code.
@@ -190,11 +204,16 @@ def build_context(
     )
     split_lines = source.splitlines()
     lines = tuple(split_lines)
+    maximum_calls_per_line = STRICT_MAXIMUM_CALLS_PER_LINE if strict else LENIENT_MAXIMUM_CALLS_PER_LINE
+    minimum_items_for_split = STRICT_MINIMUM_ITEMS_FOR_SPLIT if strict else LENIENT_MINIMUM_ITEMS_FOR_SPLIT
 
     return SourceContext(
         filename=filename,
         lines=lines,
         local_packages=local_packages,
+        maximum_calls_per_line=maximum_calls_per_line,
+        maximum_line_length=maximum_line_length,
+        minimum_items_for_split=minimum_items_for_split,
         source=source,
         tree=tree,
     )
@@ -292,6 +311,8 @@ def check_exit_statement_spacing(context: SourceContext) -> list[Violation]:
 def check_file(
     path: pathlib.Path,
     local_packages: frozenset[str],
+    strict: bool = False,
+    maximum_line_length: int = DEFAULT_MAXIMUM_LINE_LENGTH,
 ) -> list[Violation]:
     """
     Read one file and run every rule over it.
@@ -303,6 +324,8 @@ def check_file(
         source,
         filename,
         local_packages,
+        strict,
+        maximum_line_length,
     )
 
 
@@ -402,7 +425,7 @@ def check_multiple_calls_per_line(context: SourceContext) -> list[Violation]:
         line
         for line
         in call_lines
-        if call_lines.count(line) > 1
+        if call_lines.count(line) > context.maximum_calls_per_line
     }
     violations = [
         _violation(
@@ -450,6 +473,7 @@ def check_one_item_per_line(context: SourceContext) -> list[Violation]:
         if _breaks_one_item_per_line(
             node,
             parents,
+            context,
         )
     ]
 
@@ -494,6 +518,8 @@ def check_source(
     source: str,
     filename: str,
     local_packages: frozenset[str],
+    strict: bool = False,
+    maximum_line_length: int = DEFAULT_MAXIMUM_LINE_LENGTH,
 ) -> list[Violation]:
     """
     Run every rule over one source string and return the violations sorted by line.
@@ -503,6 +529,8 @@ def check_source(
             source,
             filename,
             local_packages,
+            strict,
+            maximum_line_length,
         )
     except SyntaxError as error:
         line = error.lineno or 1
@@ -631,6 +659,8 @@ def main(argv: list[str] | None = None) -> int:
         in check_file(
             python_file,
             local_packages,
+            arguments.strict,
+            arguments.maximum_line_length,
         )
     ]
     for file_violation in file_violations:
@@ -806,16 +836,18 @@ def _bound_names(tree: ast.Module) -> list[BoundName]:
 def _breaks_one_item_per_line(
     node: ast.AST,
     parents: dict[int, ast.AST],
+    context: SourceContext,
 ) -> bool:
     """
-    True when a multi-item construct keeps two items on one line or an item on the opening line.
+    True when a construct with enough items shares lines, or a smaller one does so on an over-long line.
     """
     items = _multi_item_children(
         node,
         parents,
     )
+    item_count = len(items)
 
-    if len(items) < 2:
+    if item_count < 2:
         return False
 
     item_lines = [
@@ -823,11 +855,23 @@ def _breaks_one_item_per_line(
         for item
         in items
     ]
-
-    return not _items_on_own_lines(
+    on_own_lines = _items_on_own_lines(
         node.lineno,
         item_lines,
     )
+
+    if on_own_lines:
+        return False
+
+    if item_count >= context.minimum_items_for_split:
+        return True
+
+    longest_line = _longest_line_length(
+        node,
+        context.lines,
+    )
+
+    return longest_line > context.maximum_line_length
 
 
 def _build_argument_parser() -> argparse.ArgumentParser:
@@ -848,6 +892,18 @@ def _build_argument_parser() -> argparse.ArgumentParser:
         default=[],
         dest='local_packages',
         help="Top-level package name whose 'from x import y' imports are allowed. Repeatable.",
+    )
+    parser.add_argument(
+        '--max-line-length',
+        default=DEFAULT_MAXIMUM_LINE_LENGTH,
+        dest='maximum_line_length',
+        help='Line length above which two comma-separated items must split (BLOOM010). Default 120.',
+        type=int,
+    )
+    parser.add_argument(
+        '--strict',
+        action='store_true',
+        help='Literal reading of the guide: BLOOM010 from 2 items, BLOOM012 with no nested call allowed.',
     )
 
     return parser
@@ -1753,6 +1809,23 @@ def _list_bindings(statements: list[ast.stmt]) -> list[BoundName]:
     ]
 
     return bound_names
+
+
+def _longest_line_length(
+    node: ast.AST,
+    lines: tuple[str, ...],
+) -> int:
+    """
+    Length of the longest physical line the node spans.
+    """
+    spanned = lines[node.lineno - 1:node.end_lineno]
+    lengths = [
+        len(line)
+        for line
+        in spanned
+    ]
+
+    return max(lengths)
 
 
 def _method_node_ids(tree: ast.Module) -> frozenset[int]:

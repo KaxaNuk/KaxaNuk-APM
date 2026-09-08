@@ -55,6 +55,31 @@ def codes_for(
     return codes
 
 
+def strict_codes_for(
+    rule_function: RuleFunction,
+    source: str,
+) -> list[str]:
+    """
+    Same as codes_for, with the literal (strict) reading of the threshold rules.
+    """
+    dedented_source = textwrap.dedent(source)
+    local_packages = frozenset(['my_project'])
+    context = build_context(
+        dedented_source,
+        'example.py',
+        local_packages,
+        strict=True,
+    )
+    violations = rule_function(context)
+    codes = [
+        violation.code
+        for violation
+        in violations
+    ]
+
+    return codes
+
+
 class TestCheckNestedFunctions:
     def test_inner_function_is_reported(self) -> None:
         source = '''
@@ -434,7 +459,7 @@ class TestCheckDeclarationOrder:
 class TestCheckOneItemPerLine:
     def test_multi_argument_call_on_one_line_is_reported(self) -> None:
         source = '''
-            compute(1, 2)
+            compute(1, 2, 3)
         '''
         result = codes_for(
             check_one_item_per_line,
@@ -446,7 +471,7 @@ class TestCheckOneItemPerLine:
 
     def test_multi_element_list_on_one_line_is_reported(self) -> None:
         source = '''
-            values = [1, 2]
+            values = [1, 2, 3]
         '''
         result = codes_for(
             check_one_item_per_line,
@@ -458,7 +483,7 @@ class TestCheckOneItemPerLine:
 
     def test_multi_name_from_import_on_one_line_is_reported(self) -> None:
         source = '''
-            from my_project.models import User, Account
+            from my_project.models import User, Account, Session
         '''
         result = codes_for(
             check_one_item_per_line,
@@ -470,7 +495,7 @@ class TestCheckOneItemPerLine:
 
     def test_multi_parameter_definition_on_one_line_is_reported(self) -> None:
         source = '''
-            def compute(first, second):
+            def compute(first, second, third):
                 return first
         '''
         result = codes_for(
@@ -505,6 +530,42 @@ class TestCheckOneItemPerLine:
             source,
         )
         expected = []
+
+        assert result == expected
+
+    def test_two_items_on_a_long_line_is_reported(self) -> None:
+        source = '''
+            value = compute(first_extremely_long_argument_name_number_one_padding, second_extremely_long_argument_name_number_two_padding_more)
+        '''
+        result = codes_for(
+            check_one_item_per_line,
+            source,
+        )
+        expected = ['BLOOM010']
+
+        assert result == expected
+
+    def test_two_items_on_a_short_line_is_allowed(self) -> None:
+        source = '''
+            compute(1, 2)
+        '''
+        result = codes_for(
+            check_one_item_per_line,
+            source,
+        )
+        expected = []
+
+        assert result == expected
+
+    def test_two_items_under_strict_are_reported(self) -> None:
+        source = '''
+            compute(1, 2)
+        '''
+        result = strict_codes_for(
+            check_one_item_per_line,
+            source,
+        )
+        expected = ['BLOOM010']
 
         assert result == expected
 
@@ -566,7 +627,7 @@ class TestCheckTypeHints:
 class TestCheckMultipleCallsPerLine:
     def test_nested_calls_on_one_line_are_reported(self) -> None:
         source = '''
-            value = outer(inner(1))
+            value = outer(middle(inner(1)))
         '''
         result = codes_for(
             check_multiple_calls_per_line,
@@ -587,6 +648,30 @@ class TestCheckMultipleCallsPerLine:
             source,
         )
         expected = []
+
+        assert result == expected
+
+    def test_single_nested_call_is_allowed(self) -> None:
+        source = '''
+            value = outer(inner(1))
+        '''
+        result = codes_for(
+            check_multiple_calls_per_line,
+            source,
+        )
+        expected = []
+
+        assert result == expected
+
+    def test_single_nested_call_under_strict_is_reported(self) -> None:
+        source = '''
+            value = outer(inner(1))
+        '''
+        result = strict_codes_for(
+            check_multiple_calls_per_line,
+            source,
+        )
+        expected = ['BLOOM012']
 
         assert result == expected
 
@@ -884,6 +969,39 @@ class TestMain:
         captured = capsys.readouterr()
         result = captured.out.isascii()
         expected = True
+
+        assert result == expected
+
+    def test_strict_flag_reports_two_items_on_one_line(
+        self,
+        tmp_path: pathlib.Path,
+    ) -> None:
+        two_item_file = tmp_path / 'two.py'
+        two_item_file.write_text(
+            'compute(1, 2)\n',
+            encoding='utf-8',
+        )
+        two_item_path = str(two_item_file)
+        result = main([
+            '--strict',
+            two_item_path,
+        ])
+        expected = 1
+
+        assert result == expected
+
+    def test_two_items_without_strict_returns_zero(
+        self,
+        tmp_path: pathlib.Path,
+    ) -> None:
+        two_item_file = tmp_path / 'two.py'
+        two_item_file.write_text(
+            'compute(1, 2)\n',
+            encoding='utf-8',
+        )
+        two_item_path = str(two_item_file)
+        result = main([two_item_path])
+        expected = 0
 
         assert result == expected
 
