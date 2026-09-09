@@ -85,7 +85,8 @@ package and nothing else, so a library skill never drags a research process in b
 
 | Package | Contents |
 |---|---|
-| `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
+| `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, the **`bloom-code-lint`** checker that enforces the mechanical Bloom Code rules, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
+| `context-system` | Opt-in working memory for any repository, independent of the libraries it uses: `docs/context/` (memory, lessons, todo, results, session-log) read on demand, five lifecycle hooks that create it, cap its size and record subagent results and session ends, and `/compact-context` to archive and compact. Not part of `kaxanuk`; install it only where you want the hooks. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
 | `backtest-engine` | Primitives for projects built on the KaxaNuk Backtest Engine: installing the licensed package without leaking its key, the two inputs it reads and the layouts it detects, the CLI and `PyArrowBacktester`, and reading the metrics back. |
 | `attribution-analysis` | Primitives for projects built on the KaxaNuk Attribution Analysis library: the four inputs it reads and the exact layouts, the reserved factor names, the workbook and the same configuration in code, `BrinstonFachlerArrowAttribution` and `FactorModelArrowAttribution`, and the attributes to read the tables back from. Getting the numbers out; what they mean is `alpha-decomposition`. |
@@ -96,6 +97,10 @@ For example, to add the `common` package to your project:
 
 ```bash
 apm install KaxaNuk/KaxaNuk-APM/common
+```
+Or the opt-in working-memory package:
+```bash
+apm install KaxaNuk/KaxaNuk-APM/context-system
 ```
 
 ### Pick and mix
@@ -186,4 +191,14 @@ Install the APM dev dependencies:
 
 ```bash
 apm install --dev
+```
+
+Run the unit tests of the skill scripts:
+```bash
+pytest
+```
+
+Check the repo's own Python against the Bloom Code style guide:
+```bash
+python common/.apm/skills/bloom-code-lint/scripts/bloom_code_check.py common tests --local-package bloom_code_check --local-package propagate_mcp_env_vars
 ```
