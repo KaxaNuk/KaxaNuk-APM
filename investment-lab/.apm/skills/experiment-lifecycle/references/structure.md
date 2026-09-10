@@ -1,12 +1,13 @@
 # Repository structure
 
-The canonical tree of a KaxaNuk Investment Lab strategy repository, as shipped by the **KN Research
-Process template** — public at `KaxaNuk/KaxaNuk-Research-Process`, `main` only. **The template is
-the source of truth for this tree; this file is a copy of what it looked like at the version named
-below.** When they disagree, the template wins, and this file is regenerated with
+The canonical tree of a KaxaNuk Investment Lab strategy repository, as held by the **KN Research
+Process template** — public at `KaxaNuk/KaxaNuk-Research-Process`, on its `example` branch. `main`
+ships the shape only: the six folders and the documents at the root, with the folder contents
+written down in its README. **The template is the source of truth for this tree; this file is a copy
+of what it looked like at the version named below.** When they disagree, the template wins, and this file is regenerated with
 `python tools/sync_investment_lab_references.py`.
 
-Template version: **0.6.0**. On `main` every file is a description of what is expected in it; the
+Template version: **0.7.0**. On `example` every file is a description of what is expected in it; the
 `.py` files are docstrings, the notebooks are markdown cells, the seed has a header and no rows.
 
 ```

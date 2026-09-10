@@ -1,7 +1,7 @@
 """
 Regenerate the `investment-lab` skill references from the KN Research Process template.
 
-The template -- public at `KaxaNuk/KaxaNuk-Research-Process`, `main` only -- is the source of truth
+The template -- public at `KaxaNuk/KaxaNuk-Research-Process`, its `example` branch -- is the source of truth
 for the four experiment documents and the experiment notebook that `experiment-lifecycle` ships as
 copyable references.  A skill that carried its own version of those files drifted from the template
 once already, so the copies are regenerated from the template rather than edited by hand.
@@ -13,7 +13,7 @@ Run from the repository root before a release:
     python tools/sync_investment_lab_references.py --reference v0.4.0
 
 Without `--source` the files are fetched from GitHub at the given `--reference` (a branch or a
-tag, `main` by default).  The four documents have `_1` rewritten to `_N` so they read as templates
+tag, `example` by default -- `main` is the shape only, six folders and the root documents).  The four documents have `_1` rewritten to `_N` so they read as templates
 for any experiment; the notebook is copied as it is, because a new experiment copies and renames it.
 """
 
@@ -75,7 +75,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--reference",
-        default="main",
+        default="example",
         help="the branch or tag to fetch from GitHub when --source is not given (default: main)",
     )
     arguments = parser.parse_args()
