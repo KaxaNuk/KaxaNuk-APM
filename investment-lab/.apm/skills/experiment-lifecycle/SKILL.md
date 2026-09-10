@@ -1,20 +1,20 @@
 ---
 name: experiment-lifecycle
 description: >
-  Load this skill whenever you start, structure, run or document a KaxaNuk Investment Lab
-  strategy repository or one of its experiments. Use it when the user asks to start a new strategy
-  from the KN Research Process template, scaffold an Experiments/Experiment_N/ folder, write a
-  blueprint, journal, brainstorming or findings file, update RESULTS.md or the changelog, or move
-  an experiment through the eight steps: Bibliotheca, Universe, Data, Portfolio, Backtest,
-  Attribution, Paper trading, Production. It defines the document architecture and each file's
-  contract, the notebook section contract, where each kind of logic goes, the restrictions, the bar
-  a new signal must clear and the graduation gate. It does NOT cover authoring `c_*` or `r_*`
-  columns (`data-curator-custom-calculations`, `data-refinery-custom-calculations`), screening a
-  feature (`data-analyzer-signal-screening`), the sizing seam (`portfolio-construction-seam`),
-  reading attribution output into selection, sizing and timing skill (`alpha-decomposition`), or
-  the branch-and-changelog procedure of a code repository (`how-we-work` from `common`).
+  Load this skill whenever you start, structure, run or document a KaxaNuk Investment Lab strategy
+  repository or one of its experiments. Use it when the user asks to start a strategy from the KN
+  Research Process template, scaffold an Experiments/Experiment_N/ folder, write a blueprint,
+  journal, brainstorming or findings file, update RESULTS.md or the changelog, or move an
+  experiment through the eight steps, Portfolio to Paper trading. It defines the document
+  architecture and each file's contract, the notebook section contract, where each kind of logic
+  goes, the restrictions, the bar a new signal must clear and the graduation gate. It does NOT
+  cover what a sibling skill owns: `objective-and-bibliotheca` for step 1,
+  `universe-point-in-time`, the `c_*` and `r_*` columns (`data-curator-custom-calculations`,
+  `data-refinery-custom-calculations`), `data-analyzer-signal-screening`,
+  `portfolio-construction-seam`, `alpha-decomposition` for reading attribution, or `how-we-work`
+  for branches and changelogs.
 metadata:
-  version: 0.4
+  version: 0.5
 ---
 
 # The KN Research Process — how a strategy repository is worked in
@@ -61,9 +61,10 @@ The six Lab modules map one to one onto the stages: Data Curator (`Data/curator.
 Attribution Analysis (`Experiments/attribution_analysis.py`). Three are live libraries — Curator,
 Backtest Engine, Attribution Analysis — and three are hand-rolled until the library lands; a
 hand-rolled stage says so in its docstring and names the interface the library will replace. One
-skill per stage says how each is called or written: `data-curator-custom-calculations`,
-`data-refinery-custom-calculations`, `data-analyzer-signal-screening`,
-`portfolio-construction-seam`, `backtest-engine-runs`, `attribution-analysis-runs`.
+skill per stage says how each is called or written: `universe-point-in-time` for step 2, then
+`data-curator-custom-calculations`, `data-refinery-custom-calculations`,
+`data-analyzer-signal-screening`, `portfolio-construction-seam`, `backtest-engine-runs` and
+`attribution-analysis-runs`.
 
 ## 2. The control documents
 

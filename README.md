@@ -86,6 +86,7 @@ package and nothing else, so a library skill never drags a research process in b
 | Package | Contents |
 |---|---|
 | `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
+| `universe` | Primitives for the Universe stage, step 2: the point-in-time seed and why it retains delisted names, the one required column, the two-layer security master and the recycled-identifier check, why every joined classification is `current_*`, the data-issues register, and the date from which a universe is actually usable. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
 | `data-refinery` | Primitives for the Data Refinery stage — hand-rolled in a strategy repository until the library lands: authoring the cross-sectional and fitted `r_*` columns, the `current_*` join, causality per date, the rank identity, membership from the seed, and the seam the library swaps into. |
 | `data-analyzer` | Primitives for the Data Analyzer stage: the notebook where a feature earns a backtest or is dropped — coverage, available diversification, the rank identity, the per-date information coefficient over the whole panel and the eligible pool, persistence, the two questions any signal owes, and what the stage licenses a blueprint to predict. |
@@ -143,10 +144,9 @@ apm install --update
 `backtest-engine` and `attribution-analysis` carry the three live libraries; and `data-refinery`,
 `data-analyzer` and `portfolio-construction` carry the three stages a strategy repository
 hand-rolls until each library lands — each documents the seam the library will swap into, so a
-repository written against the skill needs a one-file change when it does. Planned, in roughly
-this order: `bibliotheca` (writing a source note in the convention, what a lead is, what may be
-cited), `universe` (the point-in-time seed, data issues, usable dates), `paper-trading` (the gate,
-re-fit nothing). Each skill names which library call is the deterministic tool — **the agent never
+repository written against the skill needs a one-file change when it does. `universe` covers step 2. Planned, in roughly this
+order: `bibliotheca` (writing a source note in the convention, what a lead is, what may be cited)
+and `paper-trading` (the gate, re-fit nothing). Each skill names which library call is the deterministic tool — **the agent never
 computes the number itself.**
 
 **Distribution.** The packages stay installable with `apm install` from any harness. A Claude

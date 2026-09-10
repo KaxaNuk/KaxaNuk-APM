@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-09-10
+### Added
+- `objective-and-bibliotheca` skill: step 1 as five passes — draft the idea into three claims, turn
+  each claim into the question that would settle it, find sources per question and **deliberately
+  look for the ones that disagree**, verify every citation against the publisher's record before
+  writing the note, then rewrite the objective from the notes so each claim points at a note that
+  existed before the sentence did. Carries the note-versus-lead distinction, the note convention's
+  four rules, and a stopping condition that is about argument rather than volume: six notes that
+  argue with each other beat twenty that agree.
+- The skill was written from doing it. `liquid-momentum` on the template's `example` branch is the
+  worked example it points at, and the three design decisions that came out of that reading — the
+  one-month skip, momentum living in the Refinery, the liquidity screen worded as a cost — are the
+  argument for running step 1 before step 3 rather than after it.
+### Changed
+- `experiment-lifecycle` hands step 1 to the new skill in its *does NOT cover* clause, and says so
+  by name the way every other boundary in this repository is drawn.
+- `experiment-lifecycle` also names `universe-point-in-time` alongside the module skills, so every
+  step of the process points at the package that covers it. Its list of the eight steps loses the
+  four now owned by a sibling skill, which is what stops it being loaded for their questions.
+### Fixed
+- Both skills' descriptions fit the 1024-character ceiling a Claude skill description has. They
+  were 1207 and 1077, so the tail — the *does NOT cover* clauses that keep ten sibling skills from
+  being loaded for each other's questions — was the part at risk of being cut.
+
 ## [0.5.0] - 2026-09-09
 ### Changed
 - `experiment-lifecycle`'s references are regenerated from the template at **0.6.0**: the four
