@@ -1,0 +1,9 @@
+name: kaxanuk-apm-portfolio-construction
+version: 0.1.0
+description: APM primitives for the Portfolio Construction stage of the KN Research Process — the one weigher signature, the causal cut made once, constraints as levers, the timing helpers, and the seam the KaxaNuk Portfolio Construction library replaces
+author: Arturo Aguilar
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-09
+### Added
+- Three packages under the one name: `data-refinery`, `data-analyzer` and `portfolio-construction`
+  — the three stages a strategy repository hand-rolls until the library lands, each documenting the
+  seam the library will swap into. Eight packages resolve transitively from `kaxanuk` now.
+
 ## [0.2.0] - 2026-09-06
 ### Added
 - `attribution-analysis` joins the set, between `backtest-engine` and `investment-lab`: the

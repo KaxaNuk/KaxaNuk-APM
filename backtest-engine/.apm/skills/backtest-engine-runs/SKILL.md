@@ -58,6 +58,15 @@ and it is what a repository created from the KN Research Process template ships 
 `Config/.env.template`. The engine's published quick start still shows an older
 `KNPC_API_KEY_KAXANUK`; treat that spelling as stale. **Never print the value of either.**
 
+**Keep it installed.** The licensed package is deliberately absent from `pyproject.toml` and the
+lockfile, and `uv sync` is *exact* by default: it removes every package the lockfile does not name.
+Probed on 2026-09-09 in a strategy repository — a plain `uv run …` keeps a hand-installed package,
+`uv sync --inexact` keeps it, a bare `uv sync` removes it. So, once the engine is installed, never
+run a bare `uv sync` in that repository again; after a relock use `uv sync --inexact` (with the
+repository's groups), run everything else through `uv run`, and check `uv pip list | grep -i
+kaxanuk` before any engine run. If the engine has vanished, this is why, and the install command
+above is the fix.
+
 ## 2. Guard the import, always
 
 A clone without a licence must still run everything else. Any module or cell that imports the engine

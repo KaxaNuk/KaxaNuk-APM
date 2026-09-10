@@ -87,6 +87,9 @@ package and nothing else, so a library skill never drags a research process in b
 |---|---|
 | `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
+| `data-refinery` | Primitives for the Data Refinery stage — hand-rolled in a strategy repository until the library lands: authoring the cross-sectional and fitted `r_*` columns, the `current_*` join, causality per date, the rank identity, membership from the seed, and the seam the library swaps into. |
+| `data-analyzer` | Primitives for the Data Analyzer stage: the notebook where a feature earns a backtest or is dropped — coverage, available diversification, the rank identity, the per-date information coefficient over the whole panel and the eligible pool, persistence, the two questions any signal owes, and what the stage licenses a blueprint to predict. |
+| `portfolio-construction` | Primitives for the Portfolio Construction stage — the seam the library replaces: one weigher signature, the causal cut made once, weights summing to at most one, constraints as levers, the timing helpers, sizing by a feature, and the invariants every rule must pass. |
 | `backtest-engine` | Primitives for projects built on the KaxaNuk Backtest Engine: installing the licensed package without leaking its key, the two inputs it reads and the layouts it detects, the CLI and `PyArrowBacktester`, and reading the metrics back. |
 | `attribution-analysis` | Primitives for projects built on the KaxaNuk Attribution Analysis library: the four inputs it reads and the exact layouts, the reserved factor names, the workbook and the same configuration in code, `BrinstonFachlerArrowAttribution` and `FactorModelArrowAttribution`, and the attributes to read the tables back from. Getting the numbers out; what they mean is `alpha-decomposition`. |
 | `investment-lab` | Primitives for working inside a strategy repository built from the KN Research Process template: `experiment-lifecycle` (the eight steps, the document architecture, the notebook contract, the restrictions and the gate) and `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books). Getting the repository in the first place is the template's own `SETUP.md`. |
@@ -135,16 +138,16 @@ apm install --update
 
 ## Where this is going
 
-**One skill per step of the KN Research Process, and one per Lab module as each lands.** Today
-`investment-lab` carries the process and the attribution reading, `data-curator` carries the
-Curator's calculations, and `backtest-engine` and `attribution-analysis` carry steps 5 and 6 — the
-two licensed libraries every performance figure comes from. Planned, in roughly this order:
-`bibliotheca` (writing a source note in the convention, what a lead is, what may be cited),
-`universe` (the point-in-time seed, data issues, usable dates), `refinery` (`r_*` columns,
-causality, the rank identity), `analyzer` (the information coefficient table, the two questions any
-signal owes), `portfolio-construction` (the one signature, constraints as levers), `paper-trading`
-(the gate, re-fit nothing). Each skill names which library call is the deterministic tool — **the
-agent never computes the number itself.**
+**One skill per step of the KN Research Process, and one per Lab module.** Today
+`investment-lab` carries the process and the attribution reading; `data-curator`,
+`backtest-engine` and `attribution-analysis` carry the three live libraries; and `data-refinery`,
+`data-analyzer` and `portfolio-construction` carry the three stages a strategy repository
+hand-rolls until each library lands — each documents the seam the library will swap into, so a
+repository written against the skill needs a one-file change when it does. Planned, in roughly
+this order: `bibliotheca` (writing a source note in the convention, what a lead is, what may be
+cited), `universe` (the point-in-time seed, data issues, usable dates), `paper-trading` (the gate,
+re-fit nothing). Each skill names which library call is the deterministic tool — **the agent never
+computes the number itself.**
 
 **Distribution.** The packages stay installable with `apm install` from any harness. A Claude
 plugin marketplace built with `apm pack` is planned, so people add one marketplace and receive

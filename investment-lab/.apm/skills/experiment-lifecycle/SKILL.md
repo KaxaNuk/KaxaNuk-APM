@@ -8,12 +8,13 @@ description: >
   an experiment through the eight steps: Bibliotheca, Universe, Data, Portfolio, Backtest,
   Attribution, Paper trading, Production. It defines the document architecture and each file's
   contract, the notebook section contract, where each kind of logic goes, the restrictions, the bar
-  a new signal must clear and the graduation gate. It does NOT cover authoring Data Curator `c_*`
-  calculations (use `data-curator-custom-calculations`), reading attribution output into selection,
-  sizing and timing skill (use `alpha-decomposition`), or the branch-and-changelog procedure of a
-  code repository (use `how-we-work` from the `common` package).
+  a new signal must clear and the graduation gate. It does NOT cover authoring `c_*` or `r_*`
+  columns (`data-curator-custom-calculations`, `data-refinery-custom-calculations`), screening a
+  feature (`data-analyzer-signal-screening`), the sizing seam (`portfolio-construction-seam`),
+  reading attribution output into selection, sizing and timing skill (`alpha-decomposition`), or
+  the branch-and-changelog procedure of a code repository (`how-we-work` from `common`).
 metadata:
-  version: 0.3
+  version: 0.4
 ---
 
 # The KN Research Process — how a strategy repository is worked in
@@ -59,7 +60,10 @@ The six Lab modules map one to one onto the stages: Data Curator (`Data/curator.
 (`Experiments/portfolio_construction.py`), Backtest Engine (`Experiments/backtest_engine.py`),
 Attribution Analysis (`Experiments/attribution_analysis.py`). Three are live libraries — Curator,
 Backtest Engine, Attribution Analysis — and three are hand-rolled until the library lands; a
-hand-rolled stage says so in its docstring and names the interface the library will replace.
+hand-rolled stage says so in its docstring and names the interface the library will replace. One
+skill per stage says how each is called or written: `data-curator-custom-calculations`,
+`data-refinery-custom-calculations`, `data-analyzer-signal-screening`,
+`portfolio-construction-seam`, `backtest-engine-runs`, `attribution-analysis-runs`.
 
 ## 2. The control documents
 

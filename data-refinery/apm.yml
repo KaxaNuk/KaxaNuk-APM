@@ -1,0 +1,9 @@
+name: kaxanuk-apm-data-refinery
+version: 0.1.0
+description: APM primitives for the Data Refinery stage of the KN Research Process — authoring the cross-sectional and fitted r_* columns, the classification join, causality and the rank identity, on the seam the KaxaNuk Data Refinery library will replace
+author: Arturo Aguilar
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts: {}

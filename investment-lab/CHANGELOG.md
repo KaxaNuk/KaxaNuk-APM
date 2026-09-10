@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-09-09
+### Changed
+- `experiment-lifecycle`'s references are regenerated from the template at **0.6.0**: the four
+  experiment documents, the notebook, and `references/structure.md`, which now shows `SETUP.md`,
+  the committed `apm.yml`, `Bibliotheca/Knowledge/`, `LICENSE`, and the `current_*` prefix on the
+  refined panel.
+- `experiment-lifecycle` names the skill for each of the six stages — the three new stage packages
+  included — in its module paragraph and in its description's "does not cover" list.
+- `references/structure.md` says that a bare `uv sync` removes hand-installed licensed engines, and
+  points at `backtest-engine-runs` for the commands that keep them.
+
 ## [0.4.2] - 2026-09-06
 ### Changed
 - `alpha-decomposition` names `attribution-analysis-runs` as the skill that shapes the attribution
