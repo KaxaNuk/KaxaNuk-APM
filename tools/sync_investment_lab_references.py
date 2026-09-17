@@ -13,11 +13,18 @@ Run from the repository root before a release:
     python tools/sync_investment_lab_references.py --reference v0.4.0
 
 Without `--source` the files are fetched from GitHub at the given `--reference` (a branch or a
-tag, `example` by default -- `main` is the shape only, six folders and the root documents).  The four documents have `_1` rewritten to `_N` so they read as templates
-for any experiment; the notebook is copied as it is, because a new experiment copies and renames it.
+tag, `example` by default -- `main` is the shape only, six folders and the root documents).
+
+`example` works one strategy through the process, and keeps that strategy's own lines between
+whole-line markers -- `<!-- example: begin -->` and `<!-- example: end -->` in Markdown, and
+`# EXAMPLE-ONLY CELL` at the top of a notebook cell -- so they are stripped before anything is
+written: a reference is the template's description, never another strategy's content.  The four
+documents then have `_1` rewritten to `_N` so they read as templates for any experiment; the
+notebook keeps its name inside, because a new experiment copies and renames it.
 """
 
 import argparse
+import json
 import pathlib
 import re
 import sys
@@ -60,6 +67,15 @@ RENAMES = (
         "## Experiment N — <the idea, in five words>",
     ),
 )
+# A marker counts only as a whole line: `JOURNAL_1.md` quotes both markers inside a sentence, and a
+# match that started or stopped there would cut the file in the wrong place.
+EXAMPLE_BLOCK = re.compile(
+    r"^<!-- example: begin -->$.*?^<!-- example: end -->$\n?",
+    re.MULTILINE
+    | re.DOTALL,
+)
+EXAMPLE_ONLY_CELL = "# EXAMPLE-ONLY CELL"
+EXTRA_BLANK_LINES = re.compile(r"\n{3,}")
 
 
 def main() -> int:
@@ -76,7 +92,7 @@ def main() -> int:
     parser.add_argument(
         "--reference",
         default="example",
-        help="the branch or tag to fetch from GitHub when --source is not given (default: main)",
+        help="the branch or tag to fetch from GitHub when --source is not given (default: example)",
     )
     arguments = parser.parse_args()
 
@@ -84,13 +100,18 @@ def main() -> int:
     for template_name, reference_name in DOCUMENTS.items():
         text = read_template_text(template_name, arguments.source, arguments.reference)
         (REFERENCES_DIRECTORY / reference_name).write_text(
-            rename_experiment(text),
+            rename_experiment(
+                strip_example_content(text),
+            ),
             encoding="utf-8",
         )
         print(f"  {reference_name}")
     for template_name, reference_name in NOTEBOOK.items():
         text = read_template_text(template_name, arguments.source, arguments.reference)
-        (REFERENCES_DIRECTORY / reference_name).write_text(text, encoding="utf-8")
+        (REFERENCES_DIRECTORY / reference_name).write_text(
+            strip_example_cells(text),
+            encoding="utf-8",
+        )
         print(f"  {reference_name}")
 
     if arguments.source is not None:
@@ -102,9 +123,22 @@ def main() -> int:
     return 0
 
 
+def read_cell_source(
+    cell: dict[str, object],
+) -> str:
+    """A notebook cell's source as one string; the format allows a string or a list of lines."""
+    source = cell["source"]
+
+    if isinstance(source, list):
+
+        return "".join(source)
+
+    return source
+
+
 def read_template_text(
     template_name: str,
-    source: "pathlib.Path | None",
+    source: pathlib.Path | None,
     reference: str,
 ) -> str:
     """The text of one template file, from a local checkout or from GitHub."""
@@ -133,6 +167,88 @@ def rename_experiment(
         renamed = pattern.sub(replacement, renamed)
 
     return renamed
+
+
+def strip_example_cells(
+    text: str,
+) -> str:
+    """
+    Remove the worked strategy's cells from a notebook, and its lines from the cells that stay.
+
+    A notebook with nothing to strip is returned exactly as it was read, so regenerating it from an
+    unchanged template leaves no diff.
+    """
+    notebook = json.loads(text)
+    kept_cells = []
+    changed = False
+    for cell in notebook["cells"]:
+        source = read_cell_source(cell)
+        if source.startswith(EXAMPLE_ONLY_CELL):
+            changed = True
+            continue
+
+        stripped_source = strip_example_content(source)
+        if stripped_source != source:
+            changed = True
+            write_cell_source(
+                cell,
+                stripped_source.rstrip("\n"),
+            )
+        kept_cells.append(cell)
+
+    if not changed:
+
+        return text
+
+    notebook["cells"] = kept_cells
+
+    return json.dumps(
+        notebook,
+        indent=1,
+        ensure_ascii=False,
+    )
+
+
+def strip_example_content(
+    text: str,
+) -> str:
+    """
+    Remove the worked strategy's own lines from a Markdown text.
+
+    A removed block leaves the blank lines on both sides of it, so runs of blank lines collapse to
+    one, and a block that closed the file leaves it ending as it did — only when something was
+    removed, so a text with no markers comes back untouched.
+    """
+    stripped, removed_blocks = EXAMPLE_BLOCK.subn(
+        "",
+        text,
+    )
+
+    if removed_blocks == 0:
+
+        return text
+
+    collapsed = EXTRA_BLANK_LINES.sub(
+        "\n\n",
+        stripped,
+    )
+    trimmed = collapsed.rstrip("\n")
+    if text.endswith("\n"):
+
+        return f"{trimmed}\n"
+
+    return trimmed
+
+
+def write_cell_source(
+    cell: dict[str, object],
+    source: str,
+) -> None:
+    """Put a source back in the form the cell already used, a string or a list of lines."""
+    if isinstance(cell["source"], list):
+        cell["source"] = source.splitlines(keepends=True)
+    else:
+        cell["source"] = source
 
 
 if __name__ == "__main__":

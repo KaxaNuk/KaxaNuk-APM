@@ -88,12 +88,10 @@ package and nothing else, so a library skill never drags a research process in b
 | `common` | Primitives for any KaxaNuk system: APM usage, dev-container-aware command execution, MCP env var propagation, Python style and filesystem instructions, and **`how-we-work`** — issues before branches, the pull-request checklist, the changelog format and Semantic Versioning as KaxaNuk applies it. |
 | `universe` | Primitives for the Universe stage, step 2: the point-in-time seed and why it retains delisted names, the one required column, the two-layer security master and the recycled-identifier check, why every joined classification is `current_*`, the data-issues register, and the date from which a universe is actually usable. |
 | `data-curator` | Primitives for projects built on the KaxaNuk Data Curator, starting with authoring custom `c_*` calculations. |
-| `data-refinery` | Primitives for the Data Refinery stage — hand-rolled in a strategy repository until the library lands: authoring the cross-sectional and fitted `r_*` columns, the `current_*` join, causality per date, the rank identity, membership from the seed, and the seam the library swaps into. |
-| `data-analyzer` | Primitives for the Data Analyzer stage: the notebook where a feature earns a backtest or is dropped — coverage, available diversification, the rank identity, the per-date information coefficient over the whole panel and the eligible pool, persistence, the two questions any signal owes, and what the stage licenses a blueprint to predict. |
-| `portfolio-construction` | Primitives for the Portfolio Construction stage — the seam the library replaces: one weigher signature, the causal cut made once, weights summing to at most one, constraints as levers, the timing helpers, sizing by a feature, and the invariants every rule must pass. |
+| `portfolio-construction` | Primitives for projects built on the KaxaNuk Portfolio Construction library: installing it, the registry of sizing methods, one allocator per rebalance date on a history cut before it, the loaders' traps, the weight file the Backtest Engine reads, and the invariants every rule must pass. |
 | `backtest-engine` | Primitives for projects built on the KaxaNuk Backtest Engine: installing the licensed package without leaking its key, the two inputs it reads and the layouts it detects, the CLI and `PyArrowBacktester`, and reading the metrics back. |
-| `attribution-analysis` | Primitives for projects built on the KaxaNuk Attribution Analysis library: the four inputs it reads and the exact layouts, the reserved factor names, the workbook and the same configuration in code, `BrinstonFachlerArrowAttribution` and `FactorModelArrowAttribution`, and the attributes to read the tables back from. Getting the numbers out; what they mean is `alpha-decomposition`. |
-| `investment-lab` | Primitives for working inside a strategy repository built from the KN Research Process template: `experiment-lifecycle` (the eight steps, the document architecture, the notebook contract, the restrictions and the gate) and `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books). Getting the repository in the first place is the template's own `SETUP.md`. |
+| `attribution-analysis` | Primitives for projects built on the KaxaNuk Attribution Analysis library, written against its [public documentation](https://kaxanuk-attribution-analysis.readthedocs-hosted.com/en/latest/): the four inputs and the daily weights it requires, the workbook and the same configuration in code, `BrinstonFachlerArrowAttribution` and `FactorModelArrowAttribution`, and the attributes to read the tables back from. Getting the numbers out; what they mean is `alpha-decomposition`. |
+| `investment-lab` | Primitives for working inside a strategy repository built from the KN Research Process template: `experiment-lifecycle` (the order of work, the eight steps, the document architecture, the notebook contract, the restrictions and the gate) and `alpha-decomposition` (reading attribution in two layers and a third pass, then selection, sizing and timing by counterfactual books). Getting the repository in the first place is the template's own `SETUP.md`. |
 | `kaxanuk` | All of the above under one name. The in-house case, where every Investment Lab library is used; install a single package instead if you use one library. |
 
 For example, to add the `common` package to your project:
@@ -141,13 +139,14 @@ apm install --update
 
 **One skill per step of the KN Research Process, and one per Lab module.** Today
 `investment-lab` carries the process and the attribution reading; `data-curator`,
-`backtest-engine` and `attribution-analysis` carry the three live libraries; and `data-refinery`,
-`data-analyzer` and `portfolio-construction` carry the three stages a strategy repository
-hand-rolls until each library lands — each documents the seam the library will swap into, so a
-repository written against the skill needs a one-file change when it does. `universe` covers step 2. Planned, in roughly this
-order: `bibliotheca` (writing a source note in the convention, what a lead is, what may be cited)
-and `paper-trading` (the gate, re-fit nothing). Each skill names which library call is the deterministic tool — **the agent never
-computes the number itself.**
+`portfolio-construction`, `backtest-engine` and `attribution-analysis` carry the four libraries that
+exist; and `universe` covers step 2. The **Data Refinery** and the **Data Analyzer** get their packages
+when their libraries land — until then a strategy repository hand-rolls those stages from the
+descriptions on the template's `example` branch. **Step 1 is not a package here**: the objective, the
+reading for its claims and the notes are the work of
+[`KaxaNuk/KaxaNuk-Researcher`](https://github.com/KaxaNuk/KaxaNuk-Researcher). Planned:
+`paper-trading` (the gate, re-fit nothing). Each skill names which library call is the deterministic
+tool — **the agent never computes the number itself.**
 
 **Distribution.** The packages stay installable with `apm install` from any harness. A Claude
 plugin marketplace built with `apm pack` is planned, so people add one marketplace and receive
@@ -168,8 +167,10 @@ have said. Three rules keep the packages safe to publish:
 3. **Scan the history for secrets before a release.** Nothing from a `.env` file, no token in a
    notebook output or a log line.
 
-The references in `investment-lab/.apm/skills/experiment-lifecycle/references/` are copies of the
-template's files. Regenerate them rather than editing them:
+The four experiment documents and the notebook in
+`investment-lab/.apm/skills/experiment-lifecycle/references/` are copies of Experiment 1's files on the
+template's `example` branch, with that strategy's own lines stripped. Regenerate them rather than
+editing them; `structure.md` beside them is kept by hand.
 
 ```bash
 python tools/sync_investment_lab_references.py

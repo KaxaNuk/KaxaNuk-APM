@@ -34,6 +34,12 @@ maximum drawdown.
 Rebalance frequency, turnover, holdings, concentration, invested share, and any structural tilt —
 each with a reading of what a bad value would have meant.
 
+## The trial count
+
+How many variants were ranked to reach the book above, and every run excluded by name with its
+reason. `RESULTS.md` compiles this: a reader cannot discount a best-of-N result without knowing N,
+and the graduation sign-off says whether the deflated figure was also computed.
+
 ## Attribution — is this the signal, or a factor exposure wearing its name?
 
 Brinson-Fachler: allocation, selection, interaction. The factor model: factor against idiosyncratic.

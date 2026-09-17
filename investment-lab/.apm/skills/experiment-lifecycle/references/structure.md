@@ -1,37 +1,40 @@
 # Repository structure
 
-The canonical tree of a KaxaNuk Investment Lab strategy repository, as held by the **KN Research
-Process template** — public at `KaxaNuk/KaxaNuk-Research-Process`, on its `example` branch. `main`
-ships the shape only: the six folders and the documents at the root, with the folder contents
-written down in its README. **The template is the source of truth for this tree; this file is a copy
-of what it looked like at the version named below.** When they disagree, the template wins, and this file is regenerated with
-`python tools/sync_investment_lab_references.py`.
+The canonical tree of a KaxaNuk Investment Lab strategy repository, as the **KN Research Process
+template** holds it — public at `KaxaNuk/KaxaNuk-Research-Process`. `main` ships the shape only: the
+six folders and the documents at the root, with what goes in each folder written down in its README.
+Every file inside the folders is on the `example` branch, where one strategy, `liquid-momentum`, is
+worked through them. **The template is the source of truth for this tree; this file is a copy of what
+it looked like at the version named below**, kept by hand. When they disagree, the template wins.
 
-Template version: **0.7.0**. On `example` every file is a description of what is expected in it; the
-`.py` files are docstrings, the notebooks are markdown cells, the seed has a header and no rows.
+Template version: **0.7.5**. On `example` every file is a description of what is expected in it — the
+`.py` files are docstrings, the notebooks are markdown cells — with the strategy's own lines beside
+them between example markers.
 
 ```
 <Strategy_Name>/
 ├── SETUP.md                     # how to get the repository and set it up - an agent can follow it
-├── OBJECTIVE.md                 # the idea, the objective, the claims and their status
+├── OBJECTIVE.md                 # the idea and its claims, written before any paper is read
 ├── RESULTS.md                   # executive summary compiled from FINDINGS_N.md, citing each
 ├── CHANGELOG.md                 # every version, newest first; what a version number means here
 ├── AGENTS.md                    # how work is done: first run, workflow, restrictions, the bar, the five lies
 ├── CLAUDE.md                    # one line: @AGENTS.md
-├── README.md                    # what it is, the eight steps, where each kind of logic goes
+├── README.md                    # the strategy's own: the idea, where it stands, a link to the template
 ├── LICENSE                      # MIT
 ├── apm.yml                      # committed: the KaxaNuk skills this repository wants, one line
-├── pyproject.toml               # Python >=3.12,<3.14, uv-managed; licensed engines absent
+├── pyproject.toml               # Python >=3.12,<3.14, uv-managed; the KaxaNuk libraries installed by hand are absent
 ├── Config/
-│   └── .env.template            # provider keys and the two engine licences; copy to .env
+│   └── .env.template            # a data-provider key and the two engine licences; copy to .env
 ├── Bibliotheca/                 # step 1
-│   ├── BIBLIOGRAPHY.md          #   the index in Parts 0-5, leads apart from citations; the note convention
-│   ├── Papers/Author_Year_Title.md      # YAML frontmatter: source, citation, local_copy, read
-│   ├── Books/Author_Year_Title/INDEX.md
-│   └── Knowledge/               #   the researcher's compiled INDEX.md and LOG.md, never edited by hand
+│   ├── BIBLIOGRAPHY.md          #   the index of sources and the leads, in Parts 0-5
+│   ├── LOG.md                   #   what was read here, and when
+│   ├── Papers/Author_Year_Title.md      # one note per paper, beside its PDF; frontmatter source, citation, local_copy, read
+│   ├── Books/Author_Year_Title/INDEX.md # one folder per book: its chapters, one note per chapter chosen
+│   ├── Notes/                   #   clippings and transcripts
+│   └── Extracts/                #   the text a researcher's script pulls out of the PDFs, gitignored
 ├── Universe/                    # step 2
 │   ├── Investable_Universe.csv  #   THE SEED, committed: main_identifier is the only required column
-│   └── universe.ipynb           #   -> Security_Master.csv, Data_Issues.csv (gitignored); the usable date
+│   └── universe.ipynb           #   -> Security_Master.csv, Data_Issues.csv, Provider_Cache/ (gitignored)
 ├── Data/                        # step 3
 │   ├── curator.py               #   Data Curator driver
 │   ├── Curator/
@@ -41,15 +44,15 @@ Template version: **0.7.0**. On `example` every file is a description of what is
 │   │   └── Factors/             #   dropped in by hand: factor-model returns
 │   ├── refinery.py              #   the seam the Data Refinery library replaces
 │   ├── Refinery/
-│   │   ├── custom_calculations.py   # r_* columns: cross-sectional or fitted
+│   │   ├── custom_calculations.py   # r_* columns: cross-sectional, fitted, or with a setting to sweep
 │   │   └── Time_Series/         #   derived, gitignored — the panel every experiment reads, + current_*
 │   ├── analyzer.ipynb           #   where a feature earns a backtest or is dropped
-│   └── Analyzer/                #   charts and the IC table, gitignored
+│   └── Analyzer/                #   charts and the signal table, gitignored
 ├── Experiments/                 # steps 4-6
 │   ├── securities_panel.py      #   the one panel loader; names no strategy column
-│   ├── portfolio_construction.py    # eligible set -> weights, one signature; the library's seam
+│   ├── portfolio_construction.py    # eligible set -> weights, one signature; the library called inside it
 │   ├── backtest_engine.py       #   the one path from a weight file to a number
-│   ├── attribution_analysis.py  #   shaping the hand-supplied inputs; what is missing, first
+│   ├── attribution_analysis.py  #   the hand-supplied inputs and the book's daily weights; what is missing, first
 │   └── Experiment_N/
 │       ├── BLUEPRINT_N.md  BRAINSTORMING_N.md  JOURNAL_N.md  FINDINGS_N.md
 │       ├── experiment_N.ipynb
@@ -64,15 +67,16 @@ Template version: **0.7.0**. On `example` every file is a description of what is
 
 ## What is committed, and what is not
 
-**Only source is committed:** code, notebooks with outputs stripped, documents, the folder skeleton
-kept by `.gitkeep`, `LICENSE`, `apm.yml`, and one seed file — `Universe/Investable_Universe.csv`.
-A strategy repository also commits `uv.lock`, which pins what its results came from; the template
-ships without one. Everything under `Data/` except code, every `Portfolio/`, `Backtest/` and
-`Attribution/`, every chart, workbook, PDF and parquet is regenerated by running a stage or
-supplied by hand, and is gitignored by extension and by path. `Config/.env` is gitignored **because
-it is secret**; the template is committed. Everything APM installs — `.claude/`, `.agents/`,
-`.codex/`, `.cursor/`, `apm_modules/`, `apm.lock.yaml`, `.mcp.json` — is gitignored too, and
-installed per machine from the committed `apm.yml`.
+**Only source is committed:** code, notebooks with outputs stripped, documents and the notes, the
+folder skeleton kept by `.gitkeep`, `LICENSE`, `apm.yml`, and one seed file —
+`Universe/Investable_Universe.csv`. A strategy repository also commits `uv.lock`, which pins what its
+results came from; the template ships without one. Everything under `Data/` except code, every
+`Portfolio/`, `Backtest/` and `Attribution/`, the PDFs and `Bibliotheca/Extracts/`, every chart,
+workbook and parquet is regenerated by running a stage or supplied by hand, and is gitignored by
+extension and by path. `Config/.env` is gitignored **because it is secret**; the template is
+committed. Everything APM installs — `.claude/`, `.agents/`, `.codex/`, `.cursor/`, `apm_modules/`,
+`apm.lock.yaml`, `.mcp.json` — is gitignored too, and installed per machine from the committed
+`apm.yml`.
 
 Strip notebook outputs before committing:
 
@@ -84,24 +88,11 @@ uv run jupyter nbconvert --clear-output --inplace Universe/universe.ipynb Data/a
 
 Follow the template's own `SETUP.md`. It puts everything into **one folder**, the strategy root,
 with `.claude/`, `apm_modules/`, `apm.yml` and `.venv/` beside the process folders rather than in a
-directory above them; `uv sync` fetches Python 3.13 itself; and it asks whether to install the
-KaxaNuk agent skills rather than assuming. **Once the licensed engines are installed by hand, a
-bare `uv sync` removes them** — `backtest-engine-runs` says which commands keep them. Then, in this
-order:
-
-1. **Put the securities in `Universe/Investable_Universe.csv`.** One row each; `main_identifier` is
-   the only required column. Add whatever else the strategy groups by.
-2. **Write `OBJECTIVE.md`** — the idea, and the claims inside it, before anything is measured. Every
-   angle-bracketed slot is guidance; none survives.
-3. **Write the `c_*` and `r_*` columns** into the two `custom_calculations.py`, and fill in the
-   Curator and Refinery drivers that call the libraries.
-4. **Run steps 2 and 3 in order:** curator, `universe.ipynb`, refinery, `analyzer.ipynb`.
-5. **Write `BLUEPRINT_1.md` before the rule.** A hypothesis edited after its test is not a
-   hypothesis; its predictions table cites the analyzer section or the note each row came from.
-
-The template's benchmark rule — hold everything the signal calls eligible, equally weighted, cash for
-the rest — is described in section 2 of the notebook and is the first thing to implement, because a
-benchmark you have to write before you can measure anything is a benchmark that never gets written.
+directory above them; `uv sync` fetches Python itself; and it asks whether to install the KaxaNuk
+agent skills rather than assuming. **Once a KaxaNuk library is installed by hand, a bare `uv sync`
+removes it** — `backtest-engine-runs` says which commands keep it. Then follow the order of work in
+`SKILL.md`, section 6: the objective first, the reading for its claims, the universe, the data, the
+benchmark and `BLUEPRINT_1.md`, and only then the rule.
 
 ## Adding Experiment N to an existing strategy
 

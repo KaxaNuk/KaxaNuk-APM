@@ -1,9 +1,0 @@
-name: kaxanuk-apm-data-analyzer
-version: 0.1.0
-description: APM primitives for the Data Analyzer stage of the KN Research Process — the notebook where a feature earns a backtest or is dropped, the per-date information coefficient, the rank identity, and the two questions any signal owes an answer to
-author: Arturo Aguilar
-dependencies:
-  apm: []
-  mcp: []
-includes: auto
-scripts: {}

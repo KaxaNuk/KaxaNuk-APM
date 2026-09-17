@@ -11,7 +11,7 @@ description: >
   which books to price and how to read the numbers that come back. Shaping the attribution library's
   inputs and calling it is `attribution-analysis-runs`; pricing a book is `backtest-engine-runs`.
 metadata:
-  version: 0.2.1
+  version: 0.3.0
 ---
 
 # Alpha decomposition — is the signal doing anything?
@@ -23,10 +23,12 @@ before a strategy can graduate, and one this stack can actually answer because s
 
 The method is Paleologo's (*Advanced Portfolio Management*, 2021, chapter 8): split total return
 into factor and idiosyncratic, then split the idiosyncratic part three ways **by counterfactual
-books, never by formula**. The book is a lead in the template's `Bibliotheca/BIBLIOGRAPHY.md`; write
-its note before citing it in a findings file. Every counterfactual below is a weight file, so the
-same `Experiments/backtest_engine.py` that priced the real book prices it, over the same window, at
-the same costs.
+books, never by formula**. The book is listed in Part 0 of the `example` branch's
+`Bibliotheca/BIBLIOGRAPHY.md` as provenance, not as a note; write its note before citing it in a
+findings file. Every counterfactual below is a weight file, so the same `Experiments/backtest_engine.py`
+that priced the real book prices it, over the same window, at the same costs — and when a
+counterfactual is attributed as well, the attribution reads *its* daily weights from *its* backtest,
+never the real book's.
 
 Work in the experiment's notebook, section 5 or a section after it. Record every number in
 `FINDINGS_N.md`, then `RESULTS.md`. Publish the count of counterfactuals run.
@@ -50,10 +52,15 @@ the residual series from the factor model's output — `calc_pct_area()` names i
 saying in `FINDINGS_N.md` that it was done that way. Getting those tables out at all is
 `attribution-analysis-runs`.
 
+**Know what the library calls allocation.** KaxaNuk's Attribution Analysis computes the three effects
+**per asset and per date** — its methodology page gives the formulas, and `attribution-analysis-runs`
+repeats them — not by group. An allocation number is a statement about groups only when the inputs
+were aggregated to groups first; `FINDINGS_N.md` says which was run.
+
 Two readings, both of which count as answers:
 
-- **Allocation ≈ 0 with selection and interaction positive** means a large group tilt is *not*
-  where the money comes from. Say so plainly; it is the opposite of what the tilt makes a reader
+- **Allocation ≈ 0 with selection and interaction positive**, on inputs aggregated to groups, means a
+  large group tilt is *not* where the money comes from. Say so plainly; it is the opposite of what the tilt makes a reader
   assume.
 - **A roughly even factor / idiosyncratic split** is a *pass with a qualification* on criterion 2.
   There is real idiosyncratic alpha, and half the excess is exposure available more cheaply
@@ -172,29 +179,24 @@ column". That is worth knowing and belongs in `OBJECTIVE.md` as a falsified clai
 
 ## 5. The worked example — the template's `example` branch
 
-The KN Research Process template carries one strategy worked end to end on its `example` branch:
-twelve asset-class ETFs, a statistical jump model fitted per asset in the Refinery, and the
-benchmark rule — hold every asset in its good regime, equally weighted, cash for the rest. The
-licensed engines were absent from that clone, so **it was never priced and has no attribution**.
-It still settled three things before any engine ran, and each is a lesson for this skill:
+The KN Research Process template works one strategy through the process on its `example` branch:
+**`liquid-momentum`** — own the most heavily traded stocks that went up over the past year, equally
+weighted, and hold nothing else. It has not reached step 4, so **there is no book, no price and no
+attribution yet, and this skill quotes no number from it.** Its design already says where the
+decomposition will have to look, and each point is a lesson for this skill:
 
-- **The signal separates risk, not return.** In the good regime forward volatility is lower on
-  11 of 12 assets (−5.6 points a year) while forward return is higher on only 5 of 12. So the
-  decomposition to expect, once priced, is a Sharpe gain through the denominator — and section 3b's
-  random draws should be read on volatility as well as Sharpe.
-- **Look-ahead was worth 44 annualised points.** The same fitted model read with hindsight
-  (smoothed labels) showed a good-minus-bad forward return of +38.9%; read causally, −5.1%. The
-  two agree on 81% of days and differ exactly at the turning points. Before decomposing any fitted
-  signal, run this audit; it is one line of code and routinely the largest number in the file.
-- **A blueprint prediction was falsified by the book's shape alone.** The blueprint predicted the
-  book would average roughly half in cash; it averaged 95.3% invested, because equal weight over a
-  shrinking eligible set concentrates rather than de-risks. The two levers the blueprint declined —
-  a weight cap and a minimum holding count — turned out to be the entire defensive mechanism.
-
-**What to run first when it is priced:** the exclusion-filter test (section 4), because the
-strategy *is* the filter — same twelve assets, always eligible, equal weight. Sizing skill (3a) is
-zero by construction. Timing (3c) matters, because the rule re-strikes about 40 times a year with
-one-way turnover near 810% — the number most likely to decide whether the idea survives costs.
+- **Sizing skill is zero by construction.** Equal weight across whatever passes the screen is the
+  sizing claim, so section 3a has nothing to measure — report it as zero, not as a finding.
+- **The signal is absolute.** `r_momentum_12_1 > 0` compares a stock with its own past, while the
+  momentum evidence its objective cites ranks winners against losers. A factor model built on relative
+  momentum may assign it close to nothing, which is section 2's finding, not a verdict on the signal.
+- **So the exclusion-filter test runs first** (section 4): the same liquid top quintile, equally
+  weighted, with the momentum condition switched off. The gap between the two books is what the
+  signal does as a filter; the random draws of section 3b, from the liquid quintile at the same sizes,
+  are what it does as a selector.
+- **Timing waits on a decision.** No rebalance rule is chosen yet — it is one of five design questions
+  `Experiments/Experiment_1/JOURNAL_1.md` leaves open before `BLUEPRINT_1.md` — and section 3c's
+  shifted entries mean nothing until the real entries have a rule.
 
 ## What this skill will not let you do
 

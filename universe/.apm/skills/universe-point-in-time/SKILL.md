@@ -8,12 +8,12 @@ description: >
   to reconcile a provider against the seed, what a recycled identifier is, why classifications are
   prefixed `current_`, what belongs in `Data_Issues.csv`, or from which date a universe is usable.
   It covers the seed's contract, the two-layer master, the checks and the usable date. It does NOT
-  cover downloading prices (use `data-curator-custom-calculations`), the cross-sectional panel
-  (use `data-refinery-custom-calculations`), screening a feature (use
-  `data-analyzer-signal-screening`), or the research process around the stage (use
-  `experiment-lifecycle`).
+  cover downloading prices (use `data-curator-custom-calculations`), the refinery's cross-sectional
+  panel or screening a feature (the template's `Data/refinery.py` and `Data/analyzer.ipynb` describe
+  them), sizing a book (use `portfolio-construction-runs`), or the research process around the stage
+  (use `experiment-lifecycle`).
 metadata:
-  version: 0.1.0
+  version: 0.1.1
 ---
 
 # The Universe — the eligible list, rebuilt for each date rather than for today
@@ -25,16 +25,17 @@ testing on the winners that happened to survive.
 **Eligibility is decided here and nowhere else.** Everything downstream reads the security master
 and does not second-guess it.
 
-The stage sits **between** the two Data commands, and the order is not cosmetic: the curator
-downloads from the seed, this notebook profiles what the curator wrote, and the refinery joins the
-master this notebook produces.
+The stage comes **after the objective**: the claims in `OBJECTIVE.md` decide what the universe has to
+contain, so the seed is chosen once they exist. And it sits **between** the two Data commands, where
+the order is not cosmetic either: the curator downloads from the seed, this notebook profiles what the
+curator wrote, and the refinery joins the master this notebook produces.
 
 ```
 Universe/Investable_Universe.csv   the seed, committed  ->  edit this to change the universe
         |
         +--> Data/curator.py       downloads one file per identifier in it
         |
-        +--> universe.ipynb        Security_Master.csv, Data_Issues.csv, Charts/
+        +--> universe.ipynb        Security_Master.csv, Data_Issues.csv
                     |
                     +--> Data/refinery.py    joins the master onto the panel as current_*
 ```
@@ -161,7 +162,6 @@ Nothing else in the pipeline says so, which is why it is answered here, and why 
 | --- | --- |
 | `Universe/Security_Master.csv` | `Data/refinery.py`, which joins its columns onto the panel as `current_*` |
 | `Universe/Data_Issues.csv` | the caveats table of every `FINDINGS_N.md`, and the Data stage's work list |
-| `Universe/Charts/` | `FINDINGS_N.md` |
 | The usable date | `BLUEPRINT_N.md`, as the declared window |
 
 `Security_Master.csv`, `Data_Issues.csv` and the provider cache are all **regenerable and therefore

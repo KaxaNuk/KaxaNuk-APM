@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-09-17
+The first release after 0.4.2: 0.5.0 and 0.6.0 were never published, and this entry says what
+became of them.
+### Removed
+- `objective-and-bibliotheca`, added in the unpublished 0.6.0. Step 1 — the objective, the reading for
+  its claims, the note convention — belongs to the KaxaNuk Researcher (`KaxaNuk/KaxaNuk-Researcher`),
+  whose `objective` and `read` write those files after a plan and the owner's go. Two sources of the
+  same convention would drift.
+- `experiment-lifecycle` no longer names `data-refinery-custom-calculations` or
+  `data-analyzer-signal-screening`. Those stages wait for their libraries, and so do their skills.
+### Changed
+- `experiment-lifecycle` follows the template's **order of work**, 0.7.4: the objective before any
+  paper, reading for each claim, the universe with delisted names, the data, the benchmark and then
+  the blueprint, the broad reading, the cycle, and every finished cycle into `RESULTS.md`. It listed
+  the universe before the objective, which the Researcher had to warn about.
+- `experiment-lifecycle` says what `main` and `example` are now — the shape, and one strategy worked
+  through it between example markers — and how to bring a file across; that four stages have
+  libraries (the Data Curator, Portfolio Construction, the Backtest Engine, Attribution Analysis) and
+  two do not yet; that the attribution reads the book's **daily** weights; and that graduation
+  criterion 3 asks for the trial count published beside the winner, with the sign-off saying whether
+  the deflated figure was computed.
+- `alpha-decomposition`'s worked example is `liquid-momentum`, the strategy the template's `example`
+  branch now carries: not yet priced, so the section quotes no number, and says where the
+  decomposition will look — sizing skill zero by construction, an absolute signal a relative factor
+  model may not see, the exclusion-filter test first, timing waiting on a rebalance rule. The example
+  it described — twelve ETFs, a jump model, 95.3% invested — is no longer on that branch.
+- `alpha-decomposition` reads Brinson-Fachler the way the attribution library computes it, per asset
+  and per date; an allocation number speaks about groups only when the inputs were aggregated to
+  groups. A counterfactual that is attributed reads its own backtest's daily weights.
+- `references/structure.md` is the template's tree at 0.7.5, kept by hand: `Bibliotheca/LOG.md`,
+  `Notes/` and the gitignored `Extracts/` in place of `Knowledge/`, no `Universe/Charts/`, the
+  strategy's own README.
+- The four experiment documents and the notebook are regenerated from `example` with the example's
+  own lines stripped. `tools/sync_investment_lab_references.py` strips whole-line example markers and
+  `# EXAMPLE-ONLY CELL` cells before writing; without it the references would have carried another
+  strategy's content.
+
 ## [0.6.0] - 2026-09-10
 ### Added
 - `objective-and-bibliotheca` skill: step 1 as five passes — draft the idea into three claims, turn

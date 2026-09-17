@@ -4,25 +4,26 @@ description: >
   Load this skill whenever you start, structure, run or document a KaxaNuk Investment Lab strategy
   repository or one of its experiments. Use it when the user asks to start a strategy from the KN
   Research Process template, scaffold an Experiments/Experiment_N/ folder, write a blueprint,
-  journal, brainstorming or findings file, update RESULTS.md or the changelog, or move an
-  experiment through the eight steps, Portfolio to Paper trading. It defines the document
-  architecture and each file's contract, the notebook section contract, where each kind of logic
-  goes, the restrictions, the bar a new signal must clear and the graduation gate. It does NOT
-  cover what a sibling skill owns: `objective-and-bibliotheca` for step 1,
-  `universe-point-in-time`, the `c_*` and `r_*` columns (`data-curator-custom-calculations`,
-  `data-refinery-custom-calculations`), `data-analyzer-signal-screening`,
-  `portfolio-construction-seam`, `alpha-decomposition` for reading attribution, or `how-we-work`
-  for branches and changelogs.
+  journal, brainstorming or findings file, update RESULTS.md or the changelog, or move a strategy
+  through the order of work and the eight steps. It defines the document architecture and each
+  file's contract, the notebook section contract, where each kind of logic goes, the restrictions,
+  the bar a new signal must clear and the graduation gate. It does NOT cover what another tool
+  owns: step 1's objective and notes (the KaxaNuk Researcher), `universe-point-in-time`, the `c_*`
+  columns (`data-curator-custom-calculations`), sizing a book (`portfolio-construction-runs`),
+  running the engines (`backtest-engine-runs`, `attribution-analysis-runs`), reading attribution
+  (`alpha-decomposition`), or branches and changelogs (`how-we-work`).
 metadata:
-  version: 0.5
+  version: 0.6
 ---
 
 # The KN Research Process — how a strategy repository is worked in
 
 Every KaxaNuk Investment Lab strategy lives in its own repository, copied from the **KN Research
-Process template**, public at `KaxaNuk/KaxaNuk-Research-Process`. The template's `main` holds no
-code: every file is a short description of what is expected in it — what the stage produces, what
-it prevents, where its logic belongs. The fixed shape buys comparability and legibility: any
+Process template**, public at `KaxaNuk/KaxaNuk-Research-Process`. The template's `main` is the shape
+and nothing else: six folders and the documents at the root. Its `example` branch works one strategy,
+`liquid-momentum`, through the same folders — every file a description of what is expected in it,
+what the stage produces and prevents, with the strategy's own lines between example markers. The
+fixed shape buys comparability and legibility: any
 experiment looks like any other, every experiment is measured against the same declared benchmark,
 and a CIO reads the whole state of a project from two files, `OBJECTIVE.md` and `RESULTS.md`.
 
@@ -41,7 +42,7 @@ stage above it.
 
 | # | Step | In plain words | It produces | It prevents | Where |
 | --- | --- | --- | --- | --- | --- |
-| 1 | **Bibliotheca** | a literature review with a thesis at the end of it | a referenced hypothesis, dated | backtesting a hunch you cannot defend | `Bibliotheca/`, `OBJECTIVE.md` |
+| 1 | **Bibliotheca** | the idea and its claims first, then the literature that argues with them | a referenced hypothesis, dated | backtesting a hunch you cannot defend | `OBJECTIVE.md`, `Bibliotheca/` |
 | 2 | **Universe** | the eligible list, rebuilt for each date rather than for today | a point-in-time membership table | survivorship bias | `Universe/` |
 | 3 | **Data** | curation, then refinery, then analysis | a reproducible dataset, and evidence a feature carries signal | beautiful results from broken inputs | `Data/` |
 | 4 | **Portfolio** | how much of what, and how often you change your mind | weights with position and turnover limits | a good signal in a book nobody could hold | `Experiments/Experiment_N/` |
@@ -58,13 +59,15 @@ one command or one notebook.
 The six Lab modules map one to one onto the stages: Data Curator (`Data/curator.py`), Data Refinery
 (`Data/refinery.py`), Data Analyzer (`Data/analyzer.ipynb`), Portfolio Construction
 (`Experiments/portfolio_construction.py`), Backtest Engine (`Experiments/backtest_engine.py`),
-Attribution Analysis (`Experiments/attribution_analysis.py`). Three are live libraries — Curator,
-Backtest Engine, Attribution Analysis — and three are hand-rolled until the library lands; a
-hand-rolled stage says so in its docstring and names the interface the library will replace. One
-skill per stage says how each is called or written: `universe-point-in-time` for step 2, then
-`data-curator-custom-calculations`, `data-refinery-custom-calculations`,
-`data-analyzer-signal-screening`, `portfolio-construction-seam`, `backtest-engine-runs` and
-`attribution-analysis-runs`.
+Attribution Analysis (`Experiments/attribution_analysis.py`). Four have libraries — the Data Curator,
+Portfolio Construction, the Backtest Engine and Attribution Analysis — and two, the Refinery and the
+Analyzer, are hand-rolled until theirs land; a hand-rolled stage says so in its docstring and names
+the interface its library will replace. A skill says how each library is called:
+`data-curator-custom-calculations`, `portfolio-construction-runs`, `backtest-engine-runs` and
+`attribution-analysis-runs`, with `universe-point-in-time` for step 2. **Step 1 is the KaxaNuk
+Researcher's**, a separate project (`KaxaNuk/KaxaNuk-Researcher`): its `objective` drafts the claims,
+its `read` writes the notes in `Bibliotheca/`, and its `blueprint` drafts `BLUEPRINT_N.md` with every
+prediction citing a note.
 
 ## 2. The control documents
 
@@ -103,8 +106,11 @@ append-only so the path is recoverable. `FINDINGS` is rewritten so there is one 
 blueprint cites where it comes from** — a note in `Bibliotheca/` or a section of the analyzer — and
 a prediction with no source is a lead to read first, not a prediction.
 
-Repository-level history — choosing the benchmark, the data step, the architecture — belongs in
-`JOURNAL_1.md`, Experiment 1 being the declared benchmark. Later journals point there.
+Repository-level history — the benchmark once the first entry of `BRAINSTORMING_1.md` has chosen it,
+the data step, the architecture — belongs in `JOURNAL_1.md`, Experiment 1 being the declared
+benchmark. Later journals point there. That brainstorming entry is the one step allowed before
+`BLUEPRINT_1.md`: Experiment 1 *is* the benchmark, so choosing it cannot wait for the blueprint that
+depends on it.
 
 ## 4. The notebook — one section contract, one cell that is the strategy
 
@@ -130,13 +136,15 @@ is sold on the last day it still has a fill price.
 
 **Four modules beside the notebook are shared by every experiment**, one per Lab library:
 `securities_panel.py` (the one panel loader), `portfolio_construction.py` (eligible set to weights,
-one signature every scheme shares, constraints switched off by default as levers a later experiment
-earns), `backtest_engine.py` (the one path from a weight file to a number), `attribution_analysis.py`
-(shaping the hand-supplied inputs, saying what is missing first). **A strategy column is named in
-exactly two kinds of place — a notebook's setup cell and the rule — never in a shared module**, so a
-signal cannot become every later experiment's default without anyone deciding it. Experiment 1
-writes its panel loading inline because a baseline that cannot be read top to bottom is a worse
-baseline; later experiments import the loader.
+one signature every scheme shares, the Portfolio Construction library called inside it one rebalance
+date at a time where it is installed, constraints switched off by default as levers a later
+experiment earns), `backtest_engine.py` (the one path from a weight file to a number),
+`attribution_analysis.py` (shaping the hand-supplied inputs and the book's **daily** weights from the
+backtest — the attribution library rejects a rebalance-only file — and saying what is missing
+first). **A strategy column is named in exactly two kinds of place — a notebook's setup cell and the
+rule — never in a shared module**, so a signal cannot become every later experiment's default without
+anyone deciding it. Experiment 1 loads the panel through `securities_panel.py` like every later
+experiment, so the comparison is on the rule and nothing else.
 
 ## 5. Where each kind of logic goes
 
@@ -157,18 +165,36 @@ nothing to tune — stay in the Curator.
 ## 6. Scaffolding
 
 **A new strategy.** Follow the template's `SETUP.md` (get the repository, `uv sync`, the credential
-file, and the agent skills if wanted), then in this order — each step the smallest change that makes the
-next one possible:
+file, and the agent skills if wanted), then the **order of work** — *Starting your own strategy* in
+the template's README, whose eight items are not the eight steps. Where this list and that README
+disagree, the README holds.
 
-1. Put the securities in `Universe/Investable_Universe.csv`; `main_identifier` is the only required
-   column, every other column is the strategy's own.
-2. State the idea in `OBJECTIVE.md`, before anything is measured.
-3. Write the `c_*` and `r_*` columns into the two `custom_calculations.py`, and the Curator and
-   Refinery drivers that call the libraries (use `data-curator-custom-calculations`).
-4. Run steps 2 and 3 in order: curator, `universe.ipynb`, refinery, `analyzer.ipynb`. The universe
-   notebook sits between the two Data commands — it profiles what the curator downloaded and writes
-   the security master the refinery joins.
-5. Write `BLUEPRINT_1.md` before the rule. Then the rule, section 2 of the notebook.
+1. **Write `OBJECTIVE.md`** — the idea in one sentence and the claims inside it, *before any paper is
+   read* and before anything is measured. Each claim's evidence starts as the question that would
+   settle it. Reading with no claim to read for has no stopping condition.
+2. **Fine-tune the objective.** Read for each claim's question, the sources that argue against it
+   included — one note per paper or chapter in `Bibliotheca/` — then rewrite each claim's evidence
+   from the notes.
+3. **Choose the investable universe.** `Universe/Investable_Universe.csv`, one row per security,
+   **delisted names included**; `main_identifier` is the only required column (use
+   `universe-point-in-time`). The claims decide what it has to contain, which is why it comes after
+   them.
+4. **Build the data.** The `c_*` and `r_*` columns into the two `custom_calculations.py`, the Curator
+   and Refinery drivers, then run curator, `universe.ipynb`, refinery, `analyzer.ipynb` in that order.
+   The universe notebook sits between the two Data commands — it profiles what the curator downloaded
+   and writes the security master the refinery joins.
+5. **Choose the benchmark, then write `BLUEPRINT_1.md` before the rule.** The benchmark choice is the
+   first entry of `BRAINSTORMING_1.md`; every prediction in the blueprint cites a note from item 2 or
+   an analyzer measurement.
+6. **Search for papers and brainstorm** — the broad reading, for what the blueprint left open.
+7. **Run the cycle** — portfolio construction, backtest, attribution — until it is finished,
+   rewriting `FINDINGS_1.md` as its results change.
+8. **Send every finished cycle to `RESULTS.md`**, kept or rejected.
+
+Every file those items name beyond `OBJECTIVE.md` and `RESULTS.md` is on the template's `example`
+branch. Bring one across with `git fetch https://github.com/KaxaNuk/KaxaNuk-Research-Process example`
+then `git checkout FETCH_HEAD -- <path>`, and delete what is the example's: everything between the
+markers, the seed, the notes under `Bibliotheca/Papers/` and the entries in `Bibliotheca/LOG.md`.
 
 **A new experiment `N` inside an existing strategy:**
 
@@ -226,8 +252,9 @@ and routinely the largest number in it.
 
 **Graduation** to `Paper_Trading/` requires all five criteria in `Paper_Trading/BITACORA.md`: beats
 the benchmarks and its own control on engine Sharpe; attribution shows idiosyncratic alpha in both
-layers (load `alpha-decomposition`); conclusions survive perturbation and the trial count is
-deflated; costs and capacity modelled and stated; explicit sign-off. An experiment is promoted, not
+layers (load `alpha-decomposition`); conclusions survive perturbation, and the trial count is
+published beside the winner, the sign-off saying whether the deflated figure was also computed; costs
+and capacity modelled and stated; explicit sign-off. An experiment is promoted, not
 copied — `Paper_Trading_N/` mirrors `Experiment_N`, and a paper-trading script re-fits nothing.
 
 ## 9. Versioning
@@ -245,5 +272,7 @@ that reaches paper trading with its results reproduced from a clean clone.
   `findings-template.md` — the four files of an experiment, as the template ships them.
 - `references/experiment-notebook.ipynb` — the template's Experiment 1 notebook, markdown only.
 
-These references are copies of the template's files. Regenerate them from the public template with
-`python tools/sync_investment_lab_references.py` at the repository root before a release.
+The four documents and the notebook are copies of Experiment 1's files on the template's `example`
+branch, with the example's own lines stripped. Regenerate them with
+`python tools/sync_investment_lab_references.py` at the repository root before a release;
+`references/structure.md` is kept by hand.

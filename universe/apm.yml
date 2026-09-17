@@ -1,5 +1,5 @@
 name: kaxanuk-apm-universe
-version: 0.1.0
+version: 0.1.1
 description: APM primitives for the Universe stage of the KN Research Process — the point-in-time seed, the security master built from a cached provider payload, the data-issues register, and the date from which a universe is actually usable
 author: Arturo Aguilar
 dependencies:

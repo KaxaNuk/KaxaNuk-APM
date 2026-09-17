@@ -1,14 +1,12 @@
 name: kaxanuk-apm
-version: 0.4.0
-description: Every KaxaNuk APM package under one name — the house rules, plus one skill package per Investment Lab library, live or seam. The in-house set; install a single package instead if you use one library.
+version: 0.5.0
+description: Every KaxaNuk APM package under one name — the house rules, the process, and one skill package per Investment Lab library that has one. The in-house set; install a single package instead if you use one library.
 author: Arturo Aguilar
 dependencies:
   apm:
     - KaxaNuk/KaxaNuk-APM/common
     - KaxaNuk/KaxaNuk-APM/universe
     - KaxaNuk/KaxaNuk-APM/data-curator
-    - KaxaNuk/KaxaNuk-APM/data-refinery
-    - KaxaNuk/KaxaNuk-APM/data-analyzer
     - KaxaNuk/KaxaNuk-APM/portfolio-construction
     - KaxaNuk/KaxaNuk-APM/backtest-engine
     - KaxaNuk/KaxaNuk-APM/attribution-analysis

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-09-17
+### Removed
+- `FEEDBACK-programmatic-and-notebook-flow.md`, the feedback the 0.2.0 skill was rewritten from. All
+  four of its gaps — calculations defined in memory, the column selection without Excel, the whole
+  configuration in code, validation without a file — are covered by `programmatic-run.md`, and the
+  note was never part of the installed skill.
+
 ## [0.2.0] - 2026-07-25
 ### Added
 - `programmatic-run.md` reference to the `data-curator-custom-calculations` skill, covering running `main()`

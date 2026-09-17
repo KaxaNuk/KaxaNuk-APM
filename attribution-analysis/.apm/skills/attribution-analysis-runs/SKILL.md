@@ -2,26 +2,29 @@
 name: attribution-analysis-runs
 description: >
   Load this skill whenever a run of the KaxaNuk Attribution Analysis library is being set up,
-  executed, debugged or read. Use it when the user asks to install `kaxanuk-attribution-analysis`,
-  initialise its project files, shape the four inputs it reads (market data, portfolio weights,
-  benchmark weights and returns, per-factor returns), fill in
-  `attribution_analysis_parameters.xlsx`, call the CLI or `performance_attribution.main`, drive
-  `BrinstonFachlerArrowAttribution` or `FactorModelArrowAttribution` directly, or get the
-  allocation / selection / interaction and per-factor tables back out. It covers the exact input
-  layouts, the reserved factor names, the traps that produce a clean-looking but wrong run, and how
-  step 6 is called from a KN Research Process repository. It does NOT cover what the numbers mean
-  for a strategy (use `alpha-decomposition`) or running the backtest that produced the weights (use
-  `backtest-engine-runs`).
+  executed, debugged or read. Use it when the user asks to install `kaxanuk-attribution_analysis`,
+  initialise its project files, shape the four inputs it reads (market data, daily portfolio and
+  benchmark weights, benchmark returns, per-factor returns), turn a backtested book into the daily
+  weights it requires, fill in `attribution_analysis_parameters.xlsx`, call the CLI or
+  `performance_attribution.main`, drive `BrinstonFachlerArrowAttribution` or
+  `FactorModelArrowAttribution` directly, or get the allocation / selection / interaction and
+  per-factor tables back out. It covers the exact input layouts, the traps that produce a
+  clean-looking but wrong run, and how step 6 is called from a KN Research Process repository. It
+  does NOT cover what the numbers mean for a strategy (use `alpha-decomposition`) or running the
+  backtest that produced the book (use `backtest-engine-runs`).
 metadata:
-  version: 0.1
+  version: 0.2
 ---
 
 # Running the KaxaNuk Attribution Analysis
 
 Step 6 of the KaxaNuk Investment Lab: a book that beat its benchmark is taken apart into the pieces
-that explain it. The library is **licensed** and closed-source — it is not on public PyPI, and it is
-deliberately absent from the KN Research Process template's `pyproject.toml` so its index URL and
-key never enter version control.
+that explain it. The library is **licensed** — not on public PyPI, and deliberately absent from the
+KN Research Process template's `pyproject.toml` so its index URL and key never enter version control.
+Its documentation is public, at
+`https://kaxanuk-attribution-analysis.readthedocs-hosted.com/en/latest/`, and this skill is written
+against the **0.2.0** build of it. Go there for anything this file does not cover; this file keeps
+what the documentation does not say, and what a KaxaNuk repository adds.
 
 **This skill gets the numbers out. It does not read them.** What allocation, selection and the
 idiosyncratic residual mean for a strategy — and the counterfactual books that turn the residual
@@ -29,44 +32,35 @@ into selection, sizing and timing — is `alpha-decomposition`, in the `investme
 
 ## 1. Install it without leaking the key
 
-Install from the index URL in the licence welcome email:
+The documentation's quick start has the command; the ready-to-run version, key included, arrives in
+the licence welcome email:
 
 ```bash
 pip install kaxanuk-attribution_analysis --extra-index-url https://license:{YOUR_LICENSE_KEY}@{SERVER}/simple/
-```
-
-Then lay down the project files, once:
-
-```bash
 kaxanuk.attribution_analysis init excel
 ```
 
 Three rules, and the first is not negotiable:
 
 - **Never print, echo or commit the key or the index URL** — not into a notebook output, a log line,
-  a shell history or a dependency file. The command above carries a credential: run it, do not paste
-  it back. An exposed key is rotated, not edited out.
+  a shell history or a dependency file. The command carries a credential: run it, do not paste it
+  back. An exposed key is rotated, not edited out.
 - **Never add the library to a repository's dependency file.** It is installed by hand, per machine,
   by whoever holds the licence.
-- **Python 3.12 or 3.13**, per the documentation. The same ceiling as the Backtest Engine, and part
-  of why a KN Research Process repository pins `requires-python = ">=3.12,<3.14"`.
+- **Python 3.12 or 3.13** — the Backtest Engine's ceiling too, and part of why a KN Research Process
+  repository pins `requires-python = ">=3.12,<3.14"`.
 
 The licence key lives in `Config/.env` as **`KNAA_API_KEY_KAXANUK`** — a different variable from the
-engine's `KNBE_API_KEY_KAXANUK`, and both can sit in the same file. A `~/.kaxanuk_license` file or
-the exported environment variable work too. **Never print the value of any of them.**
+engine's `KNBE_API_KEY_KAXANUK`, and both sit in the same file; `~/.kaxanuk_license` or the exported
+variable work too. **Never print the value of any of them.** The licence is checked against KaxaNuk's
+server on every run, with a 24-hour local cache and a 7-day offline grace period: a run that worked
+last week can fail today on a plane, and that is the licence, not the data.
 
-`validate_license()` runs on **every** call to `main()`, against the licence server, with a 24-hour
-local cache and a 7-day offline grace period. A run that worked last week can fail today on a plane;
-that is the licence, not the data.
-
-**Keep it installed.** The licensed package is deliberately absent from `pyproject.toml` and the
-lockfile, and `uv sync` is *exact* by default: it removes every package the lockfile does not name.
-Probed on 2026-09-09 in a strategy repository — a plain `uv run …` keeps a hand-installed package,
-`uv sync --inexact` keeps it, a bare `uv sync` removes it. So, once the engine is installed, never
-run a bare `uv sync` in that repository again; after a relock use `uv sync --inexact` (with the
-repository's groups), run everything else through `uv run`, and check `uv pip list | grep -i
-kaxanuk` before any engine run. If the engine has vanished, this is why, and the install command
-above is the fix.
+**Keep it installed.** `uv sync` is *exact* by default and removes every package the lockfile does not
+name, and this one is deliberately not in the lockfile. Once it is installed, after a relock use
+`uv sync --inexact` with the repository's groups, run everything else through `uv run`, and check
+`uv pip list | grep -i kaxanuk` before step 6. If the library has vanished, that is why, and the
+install command is the fix.
 
 ## 2. Guard the import, always
 
@@ -75,9 +69,9 @@ library reports what is missing and skips, rather than raising:
 
 ```python
 try:
-    from kaxanuk.attribution_analysis.performance_attribution import main as attribution_main
+    from kaxanuk.attribution_analysis import performance_attribution
 except ImportError:
-    attribution_main = None
+    performance_attribution = None
 ```
 
 Check for `None` at the call site and say plainly that step 6 was skipped for want of the licensed
@@ -85,126 +79,121 @@ library. **A pipeline that dies at an optional import is a pipeline nobody can r
 
 ## 3. The four inputs
 
-`init excel` lays down the tree the configuration expects:
+The layouts are on the documentation's *Data Formats* page; `init excel` lays down `Input/Data/`,
+`Input/Portfolios/`, `Input/Benchmark_Portfolios/` and `Input/Factor_Models/`. What decides whether a
+run is right:
 
-```text
-Input/
-├── Data/                      one file per ticker
-├── Portfolios/                the book's weights
-├── Benchmark_Portfolios/      the benchmark's weights, and its returns
-└── Factor_Models/             one file per factor
-```
+**The weights are daily.** Portfolio and benchmark weights alike — horizontal (`Ticker` first, one
+column per date) or vertical (`Date` first, one column per ticker), no nulls. **Once a weight table
+spans a year or more, the library requires 240 to 260 rows a year** in its first and last year and
+raises `DataIntegrityError` otherwise, precisely to catch a rebalance-only file passed by mistake. So
+the weight file a Backtest Engine priced — one column per rebalance date — **cannot be passed in**,
+whatever the *Data Formats* example suggests. The attribution reads the book as it was actually held
+each trading day, drift included (section 8).
 
-**Market data — one file per security**, `{TICKER}.csv` or `{TICKER}.parquet`. Each needs a date
-column and a price column; both names are declared in the configuration (`user_column_date`,
-`user_column_price`) rather than inferred, so a provider's naming does not have to be bent. Returns
-are computed internally from the price series, and every other column is ignored. The Data Curator's
-defaults — `m_date` and `m_close_split_adjusted` — drop straight in.
-
-**Portfolio and benchmark weights.** Two layouts, detected automatically, the same pair the Backtest
-Engine reads:
-
-| Layout | First column | The rest |
-| --- | --- | --- |
-| Horizontal | `Ticker` | one column per rebalancing date |
-| Vertical | a date header | one column per ticker |
-
-Weights are decimals, and **no nulls** — a blank cell is not a zero here, it is a failed load. `.csv`
-and `.xlsx` are both read.
+**Market data — one file per security**, `{TICKER}.csv` or `{TICKER}.parquet`, with the date and price
+columns named in the configuration (`user_column_date`, `user_column_price`); returns are computed
+from the prices, and the Data Curator's `m_date` and `m_close_split_adjusted` drop straight in. Dates
+must be `YYYY-MM-DD` or `YYYY/MM/DD`. **A blank price in any row read fails that security, and one
+failed security aborts the whole load** with a single `DataLoadingError` naming them all — so trim a
+file's rows before its first price and after its last.
 
 **Benchmark returns** use the *weight-file* shape, not a two-column series: one row, one column per
-date, read through the same portfolio loader. It exists to bound the common date range.
+date.
 
-**Per-factor returns — one file per factor**, first column the date, then one column per asset
-holding that factor's return *for that asset*. Not a factor return series: an asset-by-factor panel,
-one file per factor.
+**Per-factor returns — one CSV per factor**: the first column is the date, then one column per asset
+holding that factor's return *for that asset*. Five things about that directory, none of which
+announces itself:
 
-```text
-date,AAPL,MSFT,GOOGL
-2020-01-02,0.010,-0.004,0.006
-```
+- **The file name is the factor name**, cut at the first dot: `f_residual.volatility.csv` silently
+  becomes `f_residual`, and two names that collide overwrite each other.
+- **Every entry in the directory is read as a factor file**; only `.gitkeep` is skipped. A stray
+  `notes.md` or `.DS_Store` fails there, not with a message about the directory.
+- **Only the portfolio's own tickers are read.** A column for a name the book never held is skipped in
+  0.2.0, and a held name missing from a factor file lowers that factor's coverage instead of raising.
+  The run logs `Average total factor coverage throughout the portfolio`, as a percentage, and
+  `Factor '<name>': reading k/n asset columns` per file. **Read both.** Low coverage means the factor
+  attribution describes part of the book.
+- **An explicit `start_date` earlier than a factor file's first date raises `DateRangeError`**, while a
+  late `end_date` is quietly clamped.
+- **Observed in the 0.2.0 source, not promised by the documentation:** `f_market`,
+  `f_total_factor_returns`, `f_total_excess_returns` and `f_idyo_returns` are dropped from the
+  percentage decomposition, which uses `f_total_excess_returns` as its denominator when present. Name
+  a factor one of these by accident and it vanishes without a word. The plots group on exactly
+  `f_size`, `f_momentum`, `f_beta`, `f_residual volatility` (with the space), `f_value` and
+  `f_<GICS sector>`; any other name still attributes and lands in neither panel.
 
-Four things about this directory decide whether a run is right, and none of them announce themselves:
-
-- **The file name is the factor name**, cut at the first dot: `f_momentum.csv` becomes `f_momentum`.
-  So `f_residual.volatility.csv` silently becomes `f_residual`, and two files that collide overwrite
-  each other in the dict.
-- **Every entry in the directory is read as a factor file.** Only `.gitkeep` is skipped. A stray
-  `notes.md`, a `.DS_Store` or a subdirectory is opened as CSV and fails there, not with a message
-  about the directory.
-- **`f_market`, `f_total_factor_returns`, `f_total_excess_returns` and `f_idyo_returns` are
-  reserved.** The percentage decomposition drops them from the factor set and treats
-  `f_total_excess_returns`, if present, as the denominator. Name a factor one of these by accident
-  and it vanishes from the attribution without a word.
-- **Factor columns must be a subset of the portfolio's tickers.** A column for a name the book never
-  held raises `DataValidationError`; a held name missing from a factor file does not — it is dropped
-  from that factor's coverage instead. The run logs `Average total factor coverage`; **read that
-  line.** Coverage well under 1.0 means the factor attribution is describing part of the book.
-
-The style and industry names the plots group on are exact — `f_size`, `f_momentum`, `f_beta`,
-`f_residual volatility`, `f_value` (with the space), and `f_<GICS sector>` such as
-`f_Information Technology`. Anything else still attributes; it just lands in neither panel.
+**Also observed in the source — confirm with a small run before relying on it:** `main()` loads market
+data only for the tickers in the *portfolio* weight file, so benchmark weight on a name the portfolio
+file does not list has no return and drops out of the Brinson-Fachler benchmark. List every benchmark
+constituent in the portfolio file, at zero weight, with its market data.
 
 ## 4. Configure it
 
-`Config/attribution_analysis_parameters.xlsx`, one **General** sheet, three columns: the parameter
-name in A (**do not touch**), your value in B, the description in C. The full table is in
-`references/configuration.md`. The ones that decide the run:
+`Config/attribution_analysis_parameters.xlsx`, one **General** sheet: the parameter name in A (**do
+not touch**), your value in B, the description in C. The documentation's *Configuration Reference*
+has every row; `references/configuration.md` has them with the traps below. The ones that decide the
+run are the two methods (`brinson_fachler_method`, `factor_model_method`, independent), the two
+columns read from your market data, the formats (lowercase), and the window (`YYYY-MM-DD` or `auto`).
 
-| Parameter | What it decides |
-| --- | --- |
-| `brinson_fachler_method` / `factor_model_method` | which methodologies run — `yes`/`no`, independent |
-| `user_column_date` / `user_column_price` | which columns of *your* market-data files are read |
-| `market_data_input_format` | `csv` or `parquet`, lowercase |
-| `portfolio_input_format` | `csv` or `excel`, lowercase — **see the trap below** |
-| `start_date` / `end_date` | `YYYY-MM-DD`, or `auto` to take them from the data |
-| `parameters_format_version` | system use; if the package asks, run `update excel` |
+Three traps:
 
-Two traps in this workbook:
-
-- **`portfolio_input_format = excel` is not a working path in the documented pipeline.** The
-  benchmark-returns handler is only constructed on the `csv` branch, so the Excel branch reaches an
-  unbound name. Keep the weights as `.csv` and read workbooks elsewhere until this is fixed
-  upstream — and report it as a library bug rather than working around it silently.
-- **`investable_assets_directory` and `factor_returns_by_factor_directory` are used as given**,
-  while the two weights directories are joined onto `input_directory`. The shipped template writes
-  the first two as `Input/Data` and `Input/Factor_Models` for exactly that reason. Changing
-  `input_directory` does not move them.
+- **`portfolio_input_format = excel` does not complete.** In 0.2.0 the benchmark-returns handler is
+  still built only on the `csv` branch, so the Excel branch reaches an unbound name. Keep the weights
+  as `.csv`, and report it upstream rather than working around it silently.
+- **Three directories are joined onto `input_directory`** — the portfolio weights, the benchmark
+  weights and the benchmark returns — while `investable_assets_directory` and
+  `factor_returns_by_factor_directory` are used as given. Moving `input_directory` moves the first
+  three and leaves the market data and the factors where they were.
+- **`ExcelConfigurator` ends the process on a bad cell**: it logs the configuration error and calls
+  `sys.exit`, so in a notebook a typo arrives as `SystemExit`, not as an exception you can read. A
+  notebook or a sweep builds `Configuration` directly, which raises `ConfigurationError` at
+  construction instead — and **a sweep that edits a workbook between runs is a sweep nobody will
+  reproduce.**
 
 ## 5. Run it
 
-The CLI, from the project root:
+The CLI, from the project root, is on the documentation's *CLI* page. Two details it is easy to
+misread: `autorun` on a fresh folder **installs the project files and exits** — it runs only on the
+next call — and `run` executes each entry script as its own subprocess.
 
-| Command | What it does |
-| --- | --- |
-| `kaxanuk.attribution_analysis autorun` | installs missing project files on the first run, then executes the entry script |
-| `kaxanuk.attribution_analysis init excel` | lays down `Config/`, `Input/`, `Output/` and `__main__.py` |
-| `kaxanuk.attribution_analysis run [PATHS]` | executes the given entry scripts or directories |
-| `kaxanuk.attribution_analysis update excel` | refreshes the workbook after an upgrade (also `update entry_script`) |
-
-Or in code, which is what a notebook or a sweep should use:
+In code, the documented sequence — *Running from Python* — is four calls, and the first two are not
+optional in a notebook:
 
 ```python
-configurator = ExcelConfigurator(pathlib.Path("Config") / "attribution_analysis_parameters.xlsx")
-
-main(
+load_config_env()
+configure_logger(
+    logger_name="kaxanuk.attribution_analysis",
+    logger_level=logging.INFO,
+    logger_format="[%(levelname)s] %(message)s",
+    logger_file=None,
+)
+parameters_path = pathlib.Path("Config") / "attribution_analysis_parameters.xlsx"
+configurator = ExcelConfigurator(parameters_path)
+performance_attribution.main(
     configurator.get_configuration(),
     launch_dashboard=False,
     dashboard_port=configurator.get_dashboard_port(),
 )
 ```
 
-`dashboard_port` is keyword-only and **has no default** — it is required even when the dashboard is
-off. `Configuration` is a frozen dataclass and can be built directly, without a workbook, which is
-the form a parameter sweep should take: **a sweep that edits a workbook between runs is a sweep
-nobody will reproduce.**
+`load_config_env()` is what reads `Config/.env`, and without `configure_logger` at `INFO` the coverage
+and date-range lines this skill tells you to read never print. The imports are
+`services.env_loader`, `services.configuration_logger`, `config_handlers.excel_configurator` and
+`performance_attribution`, under `kaxanuk.attribution_analysis`.
+
+- **`dashboard_port` is keyword-only and has no default** — required even with the dashboard off,
+  whatever the `main()` examples in the documentation show.
+- **`main()` shows plots itself.** With Brinson-Fachler on it always draws its figure, and with
+  `launch_dashboard=False` it draws the factor model's too — each through `plt.show()`. In a script, a
+  notebook batch or CI, call `matplotlib.use("Agg")` before `main()`, or the run blocks on a window
+  nobody will close.
 
 ## 6. Read what comes back
 
-**`main()` writes no files.** It logs, it plots, and it may serve a dashboard; the `Output/` folder
-`init` creates stays empty. The user guide's "results are written to the Output folder" does not
-match the pipeline — **to get numbers back, build the two attribution objects yourself** and read
-their attributes:
+**`main()` writes no files.** It returns `None`: log lines, figures, and perhaps a dashboard. The
+quick start, the Excel workflow and the CLI page all say results are written to `Output/`; nothing
+is. **To get numbers back, build the two attribution objects yourself** and read their attributes:
 
 ```python
 brinson = BrinstonFachlerArrowAttribution(
@@ -214,16 +203,31 @@ brinson = BrinstonFachlerArrowAttribution(
     date_column="date",
 )
 brinson.time_series_calculation()          # sets .df and .output_dict
-brinson.attribution_plots()                # sets .brinston_fach_indexes
+brinson.attribution_plots()                # sets .brinston_fach_indexes, and calls plt.show()
 ```
 
 | Attribute | What it holds |
 | --- | --- |
-| `.df` | the daily totals: `date`, `portfolio_returns`, `benchmark_returns`, `alpha`, `allocation`, `selection`, `interaction` |
-| `.output_dict` | date to per-asset detail table — the same columns plus `asset`, both weights and `returns_data` |
-| `.brinston_fach_indexes` | the cumulative sums of all six — the series to quote |
+| `.df` | the daily totals: `date`, `portfolio_returns`, `benchmark_returns`, `alpha`, `allocation`, `selection`, `interaction`; zero rows, full schema, when no date qualifies |
+| `.output_dict` | date to per-asset detail: `asset`, both weights, `returns_data`, both returns, `alpha` and the three effects |
+| `.brinston_fach_indexes` | the cumulative sums — the series to quote. Set only by `attribution_plots()` |
+
+**Read the effects the way the library defines them.** Its *Brinson-Fachler* methodology page computes
+them **per asset and per date**: with `r` the asset's return, `r_b = w_b · r`, and
+`alpha = w_p · r − r_b`, allocation is `(w_p − w_b) · r_b`, selection is `alpha · w_p`, and interaction
+the remainder. That is not the textbook group-level split, so an *allocation* number is not a sector
+bet unless the inputs were built as groups. Say which you mean when you quote one.
 
 ```python
+factor_returns = load_by_factor_returns_arrow(
+    path=factor_directory,
+    available_factors=factor_file_names,
+    portfolio_weights=portfolio_weights_entity,
+)
+factor_tables = {
+    factor_name: factor.table
+    for factor_name, factor in factor_returns.items()
+}
 factor_model = FactorModelArrowAttribution(
     daily_portfolio_weights=portfolio_weights,
     by_factor_factor_returns=factor_tables,
@@ -236,95 +240,97 @@ factor_model.calc_pct_area()               # sets .pct_df_returns
 decomposition = factor_model.cummulative_pct_decomp()
 ```
 
-`.portfolio_attribution_ts` is the daily contribution per factor, `.simulated_rets` its cumulative
-sum, `.pct_df_returns` the daily percentage split, and `cummulative_pct_decomp()` returns the
-one-number-per-factor share of total excess return at the last date. Everything is a `pa.Table`;
-`.to_pandas()` at the analysis boundary.
+`load_by_factor_returns_arrow` returns `FactorReturns` entities; the class wants their tables.
+`.portfolio_attribution_ts` is the daily contribution per factor, `.simulated_rets` its cumulative sum,
+`.pct_df_returns` the daily percentage split, and `cummulative_pct_decomp()` a dict: each factor's
+share of total excess return at the last date. Tables are `pa.Table`; `.to_pandas()` at the analysis
+boundary.
 
 Note the spelling. The classes are **`Brinston`**`FachlerArrowAttribution` and
-`.brinston_fach_indexes`, while the method is `brinson_fachler_model` and the methodology is
-Brinson-Fachler. Both spellings are load-bearing and neither is a typo you may fix.
+`.brinston_fach_indexes`, the method is `brinson_fachler_model`, and the constructor's parameter is
+`returns_investable_assets` while its interface spells it `returns_investible_assets`. All of it is as
+written; none of it is a typo you may fix.
 
 Four things to know before quoting any of it:
 
-- **The idiosyncratic residual has three spellings.** `f_idio_returns` is the column
-  `calc_pct_area()` creates; `idio_returns` is the key `cummulative_pct_decomp()` returns;
-  `f_idyo_returns` is a *reserved input* name that both drop. They are not interchangeable — say
-  which one a quoted number came from.
-- **`attribution_plots()` calls `plt.show()`, and it is the only thing that sets
-  `.brinston_fach_indexes`.** In a script, a notebook batch or CI, set a non-interactive backend
-  (`matplotlib.use("Agg")`) before calling it, or the run blocks on a window nobody will close.
+- **The idiosyncratic residual has three spellings.** `f_idio_returns` is the column `calc_pct_area()`
+  creates; `idio_returns` is the key `cummulative_pct_decomp()` returns; `f_idyo_returns` is a reserved
+  input name both drop. Say which one a quoted number came from.
 - **The percentage decomposition divides by the day's total return.** On days near zero the ratio
-  explodes; the library forward-fills the non-finite result from the previous day. Read
-  `.pct_df_returns` as a shape, and quote `cummulative_pct_decomp()` for a number.
-- **Everything is aligned to the intersection of every input's date range** before anything is
-  computed. One short factor file silently shortens the whole analysis. Log the common range the run
-  reports and state it beside the backtest window — they are usually not the same.
-
-`summary_stats(returns)` from `modules.performance_functions` gives the single-row frame the
-dashboard shows: annualised return and vol, Sharpe, max drawdown, skew, kurtosis, Cornish-Fisher VaR
-and historic CVaR. The whole module is public, so a figure in a document can be recomputed from the
-series rather than copied out of a cell — the function list is in `references/api.md`.
+  explodes, and the library forward-fills the non-finite result. Read `.pct_df_returns` as a shape and
+  quote `cummulative_pct_decomp()` for a number.
+- **Everything is aligned to the intersection of every input's date range**, and the run logs it as
+  `Aligned all tables to common date range`. One short factor file shortens the whole analysis; state
+  the common range beside the backtest window. An intersection with no dates raises rather than
+  returning an empty result.
+- `summary_stats(returns)`, in `modules.performance_functions`, gives the one-row frame the dashboard
+  shows; the whole module is public, so a figure in a document can be recomputed from the series. Its
+  functions do not infer periods per year — pass them.
 
 ## 7. The dashboard
 
-With `factor_model_method` enabled and `launch_dashboard=True`, a Dash app is served on
-`dashboard_port` (1–9999, typically 8050). Two conditions worth knowing:
-
-- **The dashboard needs the factor model.** With only Brinson-Fachler enabled, `launch_dashboard`
-  does nothing at all — static matplotlib plots are what you get.
-- `dashboard.run_server(...)` **blocks**. Never launch it from an automated run, a scheduled job or
-  a notebook you expect to finish; pass `launch_dashboard=False` and read the tables.
-
-Dash is imported lazily inside `main()`, so importing the package does not pull it in.
+With `factor_model_method` on and `launch_dashboard=True`, a Dash app is served on `dashboard_port`
+(1–9999, typically 8050). **It needs the factor model**: with only Brinson-Fachler, static matplotlib
+plots are what you get. `run_server` **blocks**, and runs with `debug=True` by default. Never launch it
+from an automated run, a scheduled job or a notebook you expect to finish: pass
+`launch_dashboard=False` and read the tables.
 
 ## 8. Inside a KN Research Process repository
 
-Step 6 reads what step 5 produced. The weight file the Backtest Engine priced is the same book the
-attribution decomposes, so the two must be shaped from one source, over one window:
+Step 6 reads what step 5 produced, and `Experiments/attribution_analysis.py` shapes it:
 
-- `Experiments/Experiment_N/Portfolio/portfolio_weights.csv` — the book, in the shape section 3
-  describes. Write it once; do not re-derive it for the attribution.
-- The benchmark's weights and its return series belong to the experiment, not to the library's
-  defaults. A benchmark chosen after seeing the result is not a benchmark.
-- `Experiments/Experiment_N/Attribution/` — where output lands, and **nothing in it is committed**:
-  no workbooks, no charts, no dashboards. The numbers reach `FINDINGS_N.md`, and `RESULTS.md` is
-  compiled from those.
-- Record the factor set — **how many files, and their names.** Attribution numbers are only
-  comparable across runs when the factor set is identical, and the file names *are* the factor set.
+- **The book's daily weights, not `Portfolio/portfolio_weights.csv`.** That file is the book on its
+  rebalance dates, which the library rejects. Take the weights the engine actually held each trading
+  day — the drifted book in its results, which the attribution library's own field definitions name
+  `Daily_Weights` — reshape them to one row per trading day and one column per identifier, the cash
+  proxy included, 0.0 where nothing was held, and write them beside the backtest's outputs.
+- **The benchmark's daily weights and its daily returns** belong to the experiment, not to the
+  library's defaults, with the same density rule. A benchmark chosen after seeing the result is not a
+  benchmark.
+- `Experiments/Experiment_N/Attribution/` is where output lands, and **nothing in it is committed**: no
+  workbooks, no charts, no dashboards. The numbers reach `FINDINGS_N.md`, and `RESULTS.md` is compiled
+  from those.
+- **Record the factor set** — how many files, and their names — and the coverage line. Attribution
+  numbers are only comparable across runs when the factor set is identical, and the file names *are*
+  the factor set.
 
 Then hand off. `alpha-decomposition` takes it from the tables: two layers and a third pass, and the
 counterfactual books that say what the residual is made of.
 
 ## What this skill will not let you do
 
+- **Pass a rebalance-only weight file** and work around the error it raises. The library is right;
+  derive the daily book.
 - **Quote a number this library did not produce.** The agent never computes an attribution figure
   itself; it shapes inputs, calls the library and reads tables back.
-- **Report a factor split without its coverage.** The `Average total factor coverage` line and the
-  count of factor files travel with every attribution number.
-- **Treat an empty `Output/` as a failed run.** It is the documented behaviour of the pipeline; read
-  the attributes instead.
+- **Report a factor split without its coverage.** The coverage line and the count of factor files
+  travel with every attribution number.
+- **Treat an empty `Output/` as a failed run.** It is what `main()` does; read the attributes instead.
 - **Silently accept a shortened window.** The common date range is an output, and it is stated.
-- **Use an in-house KaxaNuk strategy as a worked example.** Examples in this public package come
-  from the template's `example` branch only.
+- **Use an in-house KaxaNuk strategy as a worked example.** Examples in this public package come from
+  the template's `example` branch only.
 
 ## Where the documentation is
 
-This skill was written from the library's own documentation build, and every claim about behaviour
-that contradicts a prose page was read off the module source that build carries. Go to it for
-anything this file does not answer, and prefer it whenever the two disagree — except where this file
-says the documentation and the code disagree, and names which is which.
+Base: `https://kaxanuk-attribution-analysis.readthedocs-hosted.com/en/latest/`, build **0.2.0**. Prefer
+it whenever it and this file disagree — except where `references/api.md` names a place the
+documentation and the code disagree, and says which is which.
 
-| Page | Path in the docs build |
+| Page | Path under the base |
 | --- | --- |
-| Quick start | `user_guide/quick_start.html` |
-| Data formats | `user_guide/end_user_manual/data_formats.html` |
-| Configuration reference | `user_guide/end_user_manual/configuration.html` |
+| Quick start — install, licence key, project tree | `user_guide/quick_start.html` |
+| Data formats — the four inputs, the pre-run checklist | `user_guide/end_user_manual/data_formats.html` |
+| Configuration reference — every workbook row | `user_guide/end_user_manual/configuration.html` |
 | Excel workflow | `user_guide/end_user_manual/excel_workflow.html` |
 | Running from Python | `user_guide/end_user_manual/running_from_python.html` |
-| Brinson-Fachler methodology | `methodology/brinson_fachler.html` |
+| Brinson-Fachler methodology — the per-asset formulas | `methodology/brinson_fachler.html` |
 | Factor model methodology | `methodology/factor_model.html` |
-| Performance attribution — `main()` | `api_reference/performance_attribution.html` |
-| Attribution methodologies | `api_reference/attribution_methodologies.html` |
+| `main()` and `Configuration` in code | `api_reference/performance_attribution.html` |
+| `BrinstonFachlerArrowAttribution` | `api_reference/attribution_methodologies/brinson_fachler.html` |
+| `FactorModelArrowAttribution`, the factor loader | `api_reference/attribution_methodologies/factor_model.html` |
+| Weight entities — the daily-density rule | `api_reference/portfolio_data_pipeline/entities.html` |
+| `ExcelConfigurator`, `Configuration` | `api_reference/portfolio_data_pipeline/configuration.html` |
 | Metrics | `api_reference/metrics.html` |
 | CLI | `api_reference/cli.html` |
+| Dashboard | `api_reference/dashboard/core.html` |
+| Release notes | `release_notes/v0/index.html` |
