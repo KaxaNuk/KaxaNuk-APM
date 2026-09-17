@@ -127,6 +127,19 @@ apm install --mcp %YOUR_MCP_SERVER_URL%
 Every change to the AI primitives in this repo increments the packages' versions. APM pins
 dependencies to the versions it downloaded during install.
 
+Each package is released under its own tag, `{name}--v{version}`, where `{name}` is the `name` in
+that package's `apm.yml` — so `common 0.3.1` is `kaxanuk-apm-common--v0.3.1`. Eight packages
+version independently here, and a single repository-wide `vX.Y.Z` could not say which one it meant.
+Pin to a tag, or to a semver range that APM resolves against them:
+
+```yaml
+dependencies:
+  apm:
+    - git: KaxaNuk/KaxaNuk-APM
+      path: common
+      ref: ^0.3          # highest matching tag at install time
+```
+
 To update all the APM dependencies to the latest versions, run:
 
 ```bash

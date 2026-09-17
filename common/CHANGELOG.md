@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.3.1 (2026-09-17)
+
+**When you release a package from a repository that holds several, the tag is now `{name}--v{version}`; a bare `vX.Y.Z` there cannot say which package it names.**
+
+### Changed
+
+- `how-we-work` section 5 gives the tag shape APM actually resolves against. A dependency's `ref:` accepts a semver range, and APM matches it against the remote's `v{version}` and `{name}--v{version}` tags; with neither present an install fails outright rather than degrading, so a consumer of this repository could not write `ref: ^0.3` at all. The single-package case is unchanged.
+- `how-we-work` section 5 also says which commit to tag: the one where the version became the state of `main`, not the commit on the branch that wrote the bump. A bump authored early on a long branch names a tree that was never on `main`, and a tag is the one thing that cannot be fixed in place after somebody pins to it.
+
 ## 0.3.0 (2026-09-07)
 
 **Before reporting Python work as done, run the `bloom-code-lint` checker on the files you touched; the two Python instructions no longer restate what it enforces.**

@@ -3,3 +3,25 @@ name = "kaxanuk-apm"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = []
+
+# `how-we-work` tells contributors to run `uvx ruff check .` and says the repository's own
+# configuration decides the rules.  Without this section that sentence is empty: ruff applies
+# whatever its default set happens to be, which is 413 rules in 0.16.8 and moves between releases,
+# so two contributors on two ruff versions get two answers.  Pinning the selection makes the
+# prescribed command mean the same thing everywhere.
+#
+# The selection is ruff's documented default -- pyflakes plus the pycodestyle errors that catch
+# real breakage.  Style beyond that is `python-bloom-code`'s job, enforced by `bloom-code-lint`,
+# which reads rules ruff does not have.  Widening this set is a deliberate decision, not a
+# side effect of upgrading ruff.
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+]

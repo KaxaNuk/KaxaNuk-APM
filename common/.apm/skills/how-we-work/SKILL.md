@@ -10,7 +10,7 @@ description: >
   `experiment-lifecycle` from the `investment-lab` package) or Python style (the `python-bloom-code`
   and `python-pep8` instructions).
 metadata:
-  version: 0.1
+  version: 0.2
 ---
 
 # How we work — issues, branches, changelogs, versions
@@ -96,9 +96,25 @@ strategy that reaches paper trading with its results reproduced from a clean clo
 
 1. Bump the version where the repository keeps it — `pyproject.toml`, `apm.yml`, or both — in the
    same commit as the changelog entry.
-2. Tag on `main` after the merge: `git tag -a vX.Y.Z -m "X.Y.Z"` and push the tag. Consumers pin to
-   tags (`owner/repo/path#vX.Y.Z` for an APM package).
-3. For a package published to an index, the release job builds from the tag, never from a working
+2. Tag on `main` after the merge, and push the tag. **One package per repository** takes
+   `git tag -a vX.Y.Z -m "X.Y.Z"`. **A repository holding several packages that version
+   independently** takes one tag per package, `{name}--v{version}`, where `{name}` is the `name`
+   field of that package's `apm.yml`:
+
+   ```bash
+   git tag -a kaxanuk-apm-common--v0.3.0 -m "kaxanuk-apm-common 0.3.0"
+   ```
+
+   The shape is not cosmetic. APM resolves a semver range in a dependency's `ref:` against the
+   remote's tags, matching `v{version}` and `{name}--v{version}`, so a consumer can write
+   `ref: ^0.3` only if the tags are named this way; with no tag that matches, the install fails
+   with `NoMatchingTagError` rather than falling back. A single repository-wide `vX.Y.Z` cannot
+   say which of several packages it belongs to, so it is wrong wherever more than one lives.
+3. **Tag the commit where the version became the state of `main`**, which is the merge, not the
+   commit on the branch that wrote the bump. A version bump authored early on a long branch names
+   a tree that never existed on `main`, and a tag is the one thing that cannot be corrected in
+   place once somebody has pinned to it.
+4. For a package published to an index, the release job builds from the tag, never from a working
    copy.
 
 ## 6. Two things never to do
