@@ -1,0 +1,44 @@
+# What never belongs in a build context.  Without this file the whole working tree is sent to the
+# daemon and copied into the image, secrets and virtual environments included.
+#
+# `.git` is deliberately NOT ignored: the devcontainer's compose service has no bind mount, so the
+# working copy inside the container is the one this image carries, and git has to work in it.
+
+# Secrets, and anything a person filled in locally
+.env
+.env.*
+*.env
+!.env.template
+.mcp.json
+
+# Per-machine environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[codz]
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Written by apm install, per machine
+apm_modules/
+apm.lock.yaml
+.claude/
+.agents/
+.codex/
+.cursor/
+.gemini/
+.opencode/
+.windsurf/
+.claude-plugin/
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build output
+build/
+dist/
+*.egg-info/

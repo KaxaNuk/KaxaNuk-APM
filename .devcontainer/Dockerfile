@@ -1,11 +1,13 @@
 # https://hub.docker.com/_/python
 # Cf. https://luis-sena.medium.com/creating-the-perfect-python-dockerfile-51bdec41f1c8
 FROM python:3.14-slim AS base
-ARG GITHUB_TOKEN
+
+# No credential is baked into this image.  A build argument copied into ENV stays in the image and
+# in `docker history`, so a token belongs in the environment of a running container, passed by the
+# devcontainer or by compose, never in a layer.  Nothing this image installs needs one:
+# `requirements-dev.txt` comes from public PyPI.
 
 # Setup env
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
-
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 # Keep Python from generating .pyc files in the container
