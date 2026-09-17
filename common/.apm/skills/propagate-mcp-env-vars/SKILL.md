@@ -4,7 +4,7 @@ description: >
   Invoke this skill when an MCP tool returns an authentication error (401/403) and its
   server URL in apm.yml contains environment variable references (e.g. ${MY_API_KEY}).
 metadata:
-  version: 0.2
+  version: 0.2.1
 ---
 
 # Propagate MCP Environment Variables
