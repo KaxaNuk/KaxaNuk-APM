@@ -11,7 +11,7 @@ description: >
   which books to price and how to read the numbers that come back. Shaping the attribution library's
   inputs and calling it is `attribution-analysis-runs`; pricing a book is `backtest-engine-runs`.
 metadata:
-  version: 0.3.0
+  version: 0.3.1
 ---
 
 # Alpha decomposition — is the signal doing anything?
@@ -56,6 +56,13 @@ saying in `FINDINGS_N.md` that it was done that way. Getting those tables out at
 **per asset and per date** — its methodology page gives the formulas, and `attribution-analysis-runs`
 repeats them — not by group. An allocation number is a statement about groups only when the inputs
 were aggregated to groups first; `FINDINGS_N.md` says which was run.
+
+**Check the benchmark is whole before reading any of it.** The first cut prices only the securities
+the book's weight file names, so a book that lists only its holdings is compared with the part of the
+index it owns — in the run that proved it, 6% of the index's return, with alpha five times too large and
+the excess filed under interaction. Compare the first cut's `benchmark_returns` with the index's own
+return over the same window; if they are not close, the book was not widened to every constituent
+(`attribution-analysis-runs`, section 3) and no row of the table can be read yet.
 
 Two readings, both of which count as answers:
 

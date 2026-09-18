@@ -13,7 +13,7 @@ description: >
   does NOT cover what the numbers mean for a strategy (use `alpha-decomposition`) or running the
   backtest that produced the book (use `backtest-engine-runs`).
 metadata:
-  version: 0.2.2
+  version: 0.2.3
 ---
 
 # Running the KaxaNuk Attribution Analysis
@@ -133,10 +133,25 @@ the first column whatever it is called, and a file whose header row starts with 
   `f_size`, `f_momentum`, `f_beta`, `f_residual volatility` (with the space), `f_value` and
   `f_<GICS sector>`; any other name still attributes and lands in neither panel.
 
-**Also observed in the source — confirm with a small run before relying on it:** `main()` loads market
-data only for the tickers in the *portfolio* weight file, so benchmark weight on a name the portfolio
-file does not list has no return and drops out of the Brinson-Fachler benchmark. List every benchmark
-constituent in the portfolio file, at zero weight, with its market data.
+**Widen the book to the benchmark, or the first cut compares it with a fraction of the index.**
+`main()` loads market data only for the securities named in the *portfolio* weight file, and the first
+cut computes the benchmark's return from those prices alone — the benchmark returns file never enters
+it. Benchmark weight on a name the book does not list has no return and silently drops out. **List every
+benchmark constituent in the portfolio file, at zero weight where it is not held, each with a price
+series.** Proved on 0.2.0 with a book of 8 names inside a 788-name index, the other 780 priced to earn
+exactly the index's daily return:
+
+| First cut | Book only | Widened |
+| --- | --- | --- |
+| benchmark return, as a share of the index's own | 6.0% | 98.9% |
+| alpha | +0.8845 | +0.1735 |
+| interaction | +0.7415 | +0.0399 |
+| portfolio return | +0.9305 | +0.9305 |
+
+Unwidened, the benchmark was the 7.3% of the index the book happened to own, alpha came out about five
+times too large, and nearly all of the excess was filed under **interaction** — the effect least likely
+to be questioned. The book's own return did not move, which is what zero weights should do. The last
+1.1% was the 8 held names earning their own returns rather than the index's.
 
 ## 4. Configure it
 
@@ -294,9 +309,11 @@ Step 6 reads what step 5 produced, and `Experiments/attribution_analysis.py` sha
 
 - **The book's daily weights, not `Portfolio/portfolio_weights.csv`.** That file is the book on its
   rebalance dates, which the library rejects. Take the weights the engine actually held each trading
-  day — the drifted book in its results, which the attribution library's own field definitions name
-  `Daily_Weights` — reshape them to one row per trading day and one column per identifier, the cash
-  proxy included, 0.0 where nothing was held, and write them beside the backtest's outputs.
+  day — `Daily_Weights` in its results, verified on engine 0.66.0 — reshape them to one row per trading
+  day with `date_column` first, keep the cash position, drop the engine's benchmark column (it comes
+  back at zero), and **widen them to every benchmark constituent at zero weight** (section 3). The
+  engine names only what was held, so the widening is a step of its own, and every added name needs a
+  price series in the market-data directory.
 - **The benchmark's daily weights and its daily returns** belong to the experiment, not to the
   library's defaults, with the same density rule. A benchmark chosen after seeing the result is not a
   benchmark.

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-09-17
+### Changed
+- **Widening the book to the benchmark is a rule, proved by a run, where 0.2.0 carried it as a caution
+  read from the source.** The first cut prices only the securities the book's weight file names and
+  computes the benchmark's return from those prices alone; the benchmark returns file never enters it.
+  A book of 8 names in a 788-name index reported a benchmark return of 6% of the index's own, alpha about
+  five times too large and most of the excess under interaction. With the other 780 names added at zero
+  weight — priced to earn exactly the index's return — the benchmark return reached 98.9% of the index's
+  and the book's own return did not move.
+- The hand-off in section 8 says so step by step: `Daily_Weights` from the engine, `date_column` first,
+  the cash position kept, the engine's benchmark column dropped, every constituent added at zero weight
+  with a price series of its own.
+
 ## [0.2.2] - 2026-09-17
 From building both attribution objects by hand and reading their tables, which is the only way to get
 numbers out of a library whose `main()` writes nothing.

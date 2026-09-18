@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-09-17
+### Added
+- `alpha-decomposition` checks that the benchmark is whole before any row of the first cut is read.
+  The attribution library prices only the securities the book's weight file names, so an unwidened
+  book is compared with the part of the index it owns: in the run that proved it, a benchmark return of
+  6% of the index's, alpha five times too large, the excess under interaction. The check is one
+  comparison — the first cut's `benchmark_returns` against the index's own return over the window.
+
 ## [0.7.0] - 2026-09-17
 The first release after 0.4.2: 0.5.0 and 0.6.0 were never published, and this entry says what
 became of them.
