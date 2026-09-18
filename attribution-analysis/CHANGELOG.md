@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-09-17
+From building both attribution objects by hand and reading their tables, which is the only way to get
+numbers out of a library whose `main()` writes nothing.
+### Fixed
+- **The factor model class is `KNFMArrowAttribution`, not `FactorModelArrowAttribution`.** Every API
+  page uses the latter and it does not exist in 0.2.0: the import raises `ImportError`, which is where
+  anyone following the documentation stops. `interfaces` exports `KNFMArrowAttribution`, the pandas
+  `KNFMAttribution` and the interfaces `FiveFMArrowAttributionInterface` and
+  `FiveFMAttributionInterfase`; the module path keeps the `factor_model` spelling.
+### Added
+- Confirmed against a run: `.df` carries `date`, `portfolio_returns`, `benchmark_returns`, `alpha`,
+  `allocation`, `selection` and `interaction`, one row per aligned date, and the identity
+  `alpha = allocation + selection + interaction` holds; `.brinston_fach_indexes` and `.output_dict`
+  populate after `attribution_plots()`; the factor model returns `.portfolio_attribution_ts` with one
+  column per factor file, `.simulated_rets`, `.pct_df_returns` and a `cummulative_pct_decomp()` share
+  per factor plus `idio_returns`.
+- **`f_Market` is not reserved.** The decomposition excluded `f_idyo_returns`,
+  `f_total_excess_returns` and `f_total_factor_returns` and kept `f_Market` as an ordinary factor: the
+  reserved names match exactly, in lower case.
+
 ## [0.2.1] - 2026-09-17
 Corrections from running the library, version 0.2.0, on a real benchmark and twenty real factor files.
 ### Fixed

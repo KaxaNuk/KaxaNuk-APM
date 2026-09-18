@@ -7,13 +7,13 @@ description: >
   benchmark weights, benchmark returns, per-factor returns), turn a backtested book into the daily
   weights it requires, fill in `attribution_analysis_parameters.xlsx`, call the CLI or
   `performance_attribution.main`, drive `BrinstonFachlerArrowAttribution` or
-  `FactorModelArrowAttribution` directly, or get the allocation / selection / interaction and
+  `KNFMArrowAttribution` directly, or get the allocation / selection / interaction and
   per-factor tables back out. It covers the exact input layouts, the traps that produce a
   clean-looking but wrong run, and how step 6 is called from a KN Research Process repository. It
   does NOT cover what the numbers mean for a strategy (use `alpha-decomposition`) or running the
   backtest that produced the book (use `backtest-engine-runs`).
 metadata:
-  version: 0.2.1
+  version: 0.2.2
 ---
 
 # Running the KaxaNuk Attribution Analysis
@@ -238,7 +238,7 @@ factor_tables = {
     factor_name: factor.table
     for factor_name, factor in factor_returns.items()
 }
-factor_model = FactorModelArrowAttribution(
+factor_model = KNFMArrowAttribution(
     daily_portfolio_weights=portfolio_weights,
     by_factor_factor_returns=factor_tables,
     asset_returns=asset_returns,

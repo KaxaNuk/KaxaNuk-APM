@@ -57,10 +57,10 @@ BrinstonFachlerArrowAttribution(
 Effects per asset and date: `allocation = (w_p − w_b) · r_b` with `r_b = w_b · r`,
 `selection = alpha · w_p`, `interaction = alpha − allocation − selection`.
 
-## `interfaces.factor_model_arrow_attribution.FactorModelArrowAttribution`
+## `interfaces.factor_model_arrow_attribution.KNFMArrowAttribution`
 
 ```python
-FactorModelArrowAttribution(
+KNFMArrowAttribution(
     daily_portfolio_weights: pa.Table,
     by_factor_factor_returns: dict[str, pa.Table],
     asset_returns: pa.Table,
@@ -127,6 +127,11 @@ a caller should do.
    the docstring of `portfolio_transformer.detect_portfolio_format` both say `Date`/`date`; the code
    compares against `StandardField.DATE.value`, which is `date_column`, and `CsvPortfolioInputHandler`
    raises `MissingPortfolioError` naming `'Ticker' or 'date_column'`. Verified by running 0.2.0.
+7. **The factor model class is `KNFMArrowAttribution`.** Every API page calls it
+   `FactorModelArrowAttribution`, which does not exist in 0.2.0: importing that name raises
+   `ImportError`. The module path is unchanged, and `interfaces` exports `KNFMArrowAttribution`, the
+   pandas `KNFMAttribution`, and the interfaces `FiveFMArrowAttributionInterface` and
+   `FiveFMAttributionInterfase` (the last spelled as written). `main()` imports it under that name.
 
 ## Checked by running 0.2.0 on 2026-09-17
 
@@ -141,3 +146,14 @@ A full `main()` over a synthetic book, a real 788-ticker benchmark and twenty re
   line prints as a percentage: `Average total factor coverage throughout the portfolio :  100.0000%`;
 - both methodologies ran, `main()` called `plt.show()` for each (harmless under `matplotlib.use("Agg")`,
   which logs a `FigureCanvasAgg is non-interactive` warning), and **no file was written**.
+
+Building the two objects by hand afterwards, as the only way to get numbers out, returned exactly the
+attributes above: `BrinstonFachlerArrowAttribution.df` with `date`, `portfolio_returns`,
+`benchmark_returns`, `alpha`, `allocation`, `selection`, `interaction`, one row per aligned date, and
+the identity `alpha = allocation + selection + interaction` holding to floating-point precision;
+`.brinston_fach_indexes` and `.output_dict` populated after `attribution_plots()`;
+`KNFMArrowAttribution.portfolio_attribution_ts` with one column per factor file, `.simulated_rets`,
+`.pct_df_returns`, and `cummulative_pct_decomp()` returning a share per factor plus `idio_returns`.
+The decomposition **included `f_Market`** while excluding `f_idyo_returns`, `f_total_excess_returns`
+and `f_total_factor_returns`: the reserved names are matched exactly and in lower case, so a file
+named `f_Market.csv` is treated as an ordinary factor.
