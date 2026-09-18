@@ -256,10 +256,13 @@ decomposition = factor_model.cummulative_pct_decomp()
 share of total excess return at the last date. Tables are `pa.Table`; `.to_pandas()` at the analysis
 boundary.
 
-Note the spelling. The classes are **`Brinston`**`FachlerArrowAttribution` and
-`.brinston_fach_indexes`, the method is `brinson_fachler_model`, and the constructor's parameter is
-`returns_investable_assets` while its interface spells it `returns_investible_assets`. All of it is as
-written; none of it is a typo you may fix.
+Note the names, none of which is a typo you may fix. The first cut is
+**`Brinston`**`FachlerArrowAttribution` with `.brinston_fach_indexes`, while its method is
+`brinson_fachler_model`; its constructor takes `returns_investable_assets` where the interface spells
+it `returns_investible_assets`. **The factor model class is `KNFMArrowAttribution`** — the
+documentation calls it `FactorModelArrowAttribution` throughout, and importing that name from
+`interfaces.factor_model_arrow_attribution` raises `ImportError` on 0.2.0. The module path keeps the
+`factor_model` spelling; only the class is `KNFM`.
 
 Four things to know before quoting any of it:
 
@@ -337,7 +340,7 @@ documentation and the code disagree, and says which is which.
 | Factor model methodology | `methodology/factor_model.html` |
 | `main()` and `Configuration` in code | `api_reference/performance_attribution.html` |
 | `BrinstonFachlerArrowAttribution` | `api_reference/attribution_methodologies/brinson_fachler.html` |
-| `FactorModelArrowAttribution`, the factor loader | `api_reference/attribution_methodologies/factor_model.html` |
+| The factor model class — `KNFMArrowAttribution` in the code — and the factor loader | `api_reference/attribution_methodologies/factor_model.html` |
 | Weight entities — the daily-density rule | `api_reference/portfolio_data_pipeline/entities.html` |
 | `ExcelConfigurator`, `Configuration` | `api_reference/portfolio_data_pipeline/configuration.html` |
 | Metrics | `api_reference/metrics.html` |
