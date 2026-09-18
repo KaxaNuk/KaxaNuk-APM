@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-09-17
+Written from a run of engine **0.66.0** on synthetic data, not from the documentation.
+### Added
+- **What a truncated run looks like, and the check that catches it.** A book whose weights sum to
+  exactly 1.0 with `cash_reserve_percentage = 0` cannot pay commission at a rebalance: the engine
+  prints one `Cash error` line, stops valuing there, and still returns `success=True`, `error=None`,
+  a full statistics block and an Excel report. In the reproduction it valued 522 of 1305 days and
+  annualised over the stub, so its CAGR read 23.6% against the complete run's 14.2%. `data["end_date"]`
+  and `data["years"]` describe the window **valued**, not the one configured, and comparing the two is
+  the check. The skill said to check the last valued date; it now says how, and what causes it.
+- **`Daily_Weights`** named as what step 6 reads: the drifted book, one row per valued day, columns
+  being the holdings plus the benchmark and `CASH_RESERVE`. The attribution library rejects a file
+  carrying only the rebalance dates, so this is the series to write out beside the other results.
+- **`references/api.md` gains the `main()` entry point** — its keyword-only signature, `load_config_env`
+  for reading the licence out of `Config/.env`, and every key of `BacktestResult.data`, verified on
+  0.66.0.
+- Two guards worth knowing before a first run: `commission_cents` is rejected outside `[0.00, 0.10]`,
+  and every rebalancing date is checked for prices on the positions it touches.
+
 ## [0.1.3] - 2026-09-09
 ### Added
 - `backtest-engine-runs` says how to keep the licensed package installed: `uv sync` is exact by

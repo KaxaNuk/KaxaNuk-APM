@@ -13,7 +13,7 @@ description: >
   `attribution-analysis-runs`), reading attribution output (use `alpha-decomposition`), or authoring
   Data Curator `c_*` columns (use `data-curator-custom-calculations`).
 metadata:
-  version: 0.1.2
+  version: 0.1.3
 ---
 
 # Running the KaxaNuk Backtest Engine
@@ -145,9 +145,15 @@ is a decision somebody makes rather than a default nobody read.
 
 ## 6. Read what comes back
 
-`run()` returns a `BacktestResultDict`; tables arrive as PyArrow and convert to pandas for analysis.
-The Excel report carries CAGR, Sharpe, Sortino, alpha, VaR, CVaR, maximum drawdown, annual returns,
-drawdown analysis and portfolio weights.
+`run()` returns a `BacktestResultDict`, and the `main()` entry point wraps it in a `BacktestResult`
+with `success`, `error` and `data`. Tables arrive as PyArrow or pandas; the Excel report carries
+CAGR, Sharpe, Sortino, alpha, VaR, CVaR, maximum drawdown, annual returns, drawdown analysis and
+portfolio weights. `references/api.md` lists the keys of `data`, verified on 0.66.0.
+
+**`Daily_Weights` is the book as the engine actually held it**, one row per trading day, its columns
+the holdings plus the benchmark and `CASH_RESERVE`. That is the drifted daily series **step 6 reads**
+— the attribution library rejects a file that only carries the rebalance dates — so it is written out
+beside the other results rather than recomputed later from the weight file.
 
 The `metrics` module is public, so a figure quoted in a document can be recomputed from the returned
 series rather than copied out of a cell: `sharpe_ratio`, `sortino_ratio`, `annualize_rets`,
@@ -159,6 +165,27 @@ series rather than copied out of a cell: `sharpe_ratio`, `sortino_ratio`, `annua
 still produces a clean-looking summary over the stub. Check the last valued date against the window
 that was asked for, and when they differ the variant is excluded **by name, with its reason**, never
 quietly dropped.
+
+**What a truncated run looks like, reproduced on 0.66.0.** A book whose weights sum to exactly 1.0
+run with `cash_reserve_percentage = 0` cannot pay commission at a rebalance. The engine prints one
+line — `Cash error on <date> with $-340.92` — stops valuing there, and returns:
+
+| | Truncated | Complete |
+| --- | --- | --- |
+| `success` / `error` | `True` / `None` | `True` / `None` |
+| days in `Register_df` | 522 | 1305 |
+| CAGR | 23.6% | 14.2% |
+| a key naming the stub | none | — |
+
+Both runs wrote an Excel report, and the shorter one annualised over its stub, so its CAGR is the
+higher of the two. **The check that catches it:** `data["end_date"]` and `data["years"]` describe the
+window the engine *valued*, not the one the configuration asked for — compare them with the
+configured dates before reading a single metric. A cash reserve of a percent or two, or a book that
+sums to less than one, avoids the cause.
+
+Configuration guards worth knowing before a first run: `commission_cents` is rejected outside
+`[0.00, 0.10]`, and the engine checks on every rebalancing date that each position it touches has a
+price and that no position outlives its price series.
 
 ## 7. Inside a KN Research Process repository
 

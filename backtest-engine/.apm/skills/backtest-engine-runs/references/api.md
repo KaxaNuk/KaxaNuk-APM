@@ -1,8 +1,45 @@
 # Backtest Engine — the public surface
 
-Taken from the official documentation on 2026-09-06. Where a page could not be reached, this file
-says so rather than guessing: **an invented signature is worse than a missing one.** The URLs are at
-the end of `SKILL.md`.
+Taken from the official documentation on 2026-09-06, and the section below from a run of **0.66.0**
+on 2026-09-17. Where a page could not be reached, this file says so rather than guessing: **an
+invented signature is worse than a missing one.** The URLs are at the end of `SKILL.md`.
+
+## `main()` — the whole run, verified on 0.66.0
+
+```python
+kaxanuk.backtest_engine.main(
+    *,
+    configuration: Configuration,
+    input_handlers: list[InputHandlerInterface],
+    portfolio_handlers: list[PortfolioInputHandlerInterface],
+    logger_level: int = 20,
+    logger_format: str = "[%(levelname)s] %(message)s",
+    logger_file: str | bytes | os.PathLike | None,
+    launch_dashboard: bool,
+    dashboard_port: int,
+) -> BacktestResult
+```
+
+`logger_file`, `launch_dashboard` and `dashboard_port` are keyword-only with no defaults.
+`kaxanuk.backtest_engine.load_config_env(env_path)` reads the licence from a `Config/.env`, which is
+how a notebook keeps the key out of its own source. `BacktestResult` carries `success`, `error` and
+`data`; the keys of `data`:
+
+| Key | What it holds |
+| --- | --- |
+| `Register_df` | `Portfolio_Value`, `Total_Portfolio_Value`, `Returns`, indexed by the days the engine **valued** |
+| `Daily_Weights` | the drifted book, one row per valued day: the holdings, the benchmark and `CASH_RESERVE` — **what step 6 reads** |
+| `Shares_df`, `orders_df`, `portfolio_df` | share counts and orders per rebalance date, and the weight file as it was read |
+| `Commission_df`, `Slippage_df`, `Execution_costs_df`, `Total_commissions`, `Total_slippage_costs` | what the trading cost |
+| `Financing_df`, `Total_financing_costs`, `Risk_free_rate` | borrow, margin and cash interest |
+| `Forced_liquidations_df` | positions the engine had to exit, with the reason |
+| `benchmark`, `benchmarks`, `benchmark_stats`, `benchmarks_stats` | the comparison arm |
+| `portfolio_stats` | `Start Balance`, `End Balance`, `Net Return`, `PnL`, `Annualized Return (CAGR)`, `Annualized Volatility` and the rest |
+| `start_date`, `end_date`, `years`, `initial_portfolio_value`, `final_total_portfolio_value` | **the window actually valued**, and the balances |
+
+`start_date`, `end_date` and `years` describe what was valued, not what was configured. Compare them
+with the configured window before quoting a metric: a run that stopped partway still returns
+`success=True` with `error=None` (see `SKILL.md`, section 6).
 
 ## `PyArrowBacktester`
 
