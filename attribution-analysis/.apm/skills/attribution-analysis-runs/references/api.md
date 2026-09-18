@@ -123,3 +123,21 @@ a caller should do.
    docstring say every factor column must be a portfolio ticker; the loader reads only the portfolio's
    tickers, so an extra column is skipped.
 5. **The `main()` examples omit `dashboard_port`**, which the signature requires.
+6. **A vertical weight file's first header is `date_column`, not `Date`/`date`.** *Data Formats* and
+   the docstring of `portfolio_transformer.detect_portfolio_format` both say `Date`/`date`; the code
+   compares against `StandardField.DATE.value`, which is `date_column`, and `CsvPortfolioInputHandler`
+   raises `MissingPortfolioError` naming `'Ticker' or 'date_column'`. Verified by running 0.2.0.
+
+## Checked by running 0.2.0 on 2026-09-17
+
+A full `main()` over a synthetic book, a real 788-ticker benchmark and twenty real factor files:
+
+- a vertical benchmark weight file with `date_column` loads (`Detected vertical format`, 788 tickers)
+  and passes the daily-density check at about 251 rows a year;
+- the benchmark returns file loads through the same handler as one ticker;
+- factor files whose **first header is empty** load, each logging `Factor '<name>': reading k/n asset
+  columns`, with the factor name taken from the file name;
+- the alignment line is `Aligned all tables to common date range: <start> to <end>`, and the coverage
+  line prints as a percentage: `Average total factor coverage throughout the portfolio :  100.0000%`;
+- both methodologies ran, `main()` called `plt.show()` for each (harmless under `matplotlib.use("Agg")`,
+  which logs a `FigureCanvasAgg is non-interactive` warning), and **no file was written**.

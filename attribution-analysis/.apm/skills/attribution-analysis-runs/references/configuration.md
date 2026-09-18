@@ -46,6 +46,8 @@ what 0.2.0 adds:
   One bad file aborts the whole load.
 - Portfolio and benchmark weights are **daily** — 240 to 260 rows a year once they span a year — in
   place, decimals, **no nulls**.
+- Every weight file's first header is `Ticker` or **`date_column`**, the benchmark returns file
+  included. `date` is rejected, whatever the documentation says.
 - Nothing but factor CSVs lives in the factor directory. Every entry but `.gitkeep` is read as one, and
   each file's name, up to its first dot, is the factor's name.
 - A factor column for a name the book never held is skipped, not an error; a held name missing from a

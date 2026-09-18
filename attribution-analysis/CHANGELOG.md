@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-09-17
+Corrections from running the library, version 0.2.0, on a real benchmark and twenty real factor files.
+### Fixed
+- **A vertical weight file's first header is `date_column`, not `Date`/`date`.** 0.2.0 said what the
+  documentation says; the code compares against `StandardField.DATE.value` and
+  `CsvPortfolioInputHandler` raises `MissingPortfolioError: First column must be 'Ticker' or
+  'date_column'`. A file with `date` is rejected. This governs the portfolio weights, the benchmark
+  weights and the benchmark returns alike, and it is the first thing a run stops on.
+### Added
+- Confirmed by the same run, and added where it was silent: a factor file's **first header may be
+  empty**; the benchmark returns load through the portfolio loader in the vertical form, reported as
+  one ticker; a 788-ticker vertical benchmark at ~251 rows a year passes the density check; the
+  alignment and coverage lines print as `Aligned all tables to common date range: ...` and
+  `Average total factor coverage throughout the portfolio :  100.0000%`; both methodologies ran,
+  `plt.show()` was called for each, and no file was written.
+
 ## [0.2.0] - 2026-09-17
 ### Changed
 - `attribution-analysis-runs` is written against the library's **public documentation**, build 0.2.0,

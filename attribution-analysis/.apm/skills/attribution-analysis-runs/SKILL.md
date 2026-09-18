@@ -13,7 +13,7 @@ description: >
   does NOT cover what the numbers mean for a strategy (use `alpha-decomposition`) or running the
   backtest that produced the book (use `backtest-engine-runs`).
 metadata:
-  version: 0.2
+  version: 0.2.1
 ---
 
 # Running the KaxaNuk Attribution Analysis
@@ -83,8 +83,15 @@ The layouts are on the documentation's *Data Formats* page; `init excel` lays do
 `Input/Portfolios/`, `Input/Benchmark_Portfolios/` and `Input/Factor_Models/`. What decides whether a
 run is right:
 
-**The weights are daily.** Portfolio and benchmark weights alike — horizontal (`Ticker` first, one
-column per date) or vertical (`Date` first, one column per ticker), no nulls. **Once a weight table
+**The first header decides everything, and it is not what the documentation says.** A weight file is
+read as horizontal when its first header is `Ticker` and as vertical when it is **`date_column`** —
+`StandardField.DATE.value`, case-insensitive, checked on 0.2.0 by running it. Anything else raises
+`MissingPortfolioError: First column must be 'Ticker' or 'date_column'` before a number is read. *Data
+Formats* and `detect_portfolio_format`'s own docstring both say `Date`/`date`, and both are wrong;
+`date` is rejected. The same rule governs the portfolio weights, the benchmark weights and the
+benchmark returns file.
+
+**The weights are daily.** Portfolio and benchmark weights alike, no nulls. **Once a weight table
 spans a year or more, the library requires 240 to 260 rows a year** in its first and last year and
 raises `DataIntegrityError` otherwise, precisely to catch a rebalance-only file passed by mistake. So
 the weight file a Backtest Engine priced — one column per rebalance date — **cannot be passed in**,
@@ -98,12 +105,15 @@ must be `YYYY-MM-DD` or `YYYY/MM/DD`. **A blank price in any row read fails that
 failed security aborts the whole load** with a single `DataLoadingError` naming them all — so trim a
 file's rows before its first price and after its last.
 
-**Benchmark returns** use the *weight-file* shape, not a two-column series: one row, one column per
-date.
+**Benchmark returns** go through the same portfolio loader, so they take the same two shapes: one row
+of dates-as-columns, or a vertical file whose first header is `date_column` and whose single other
+column is the index's daily return. Checked on 0.2.0: the vertical form loads and is reported as one
+ticker.
 
 **Per-factor returns — one CSV per factor**: the first column is the date, then one column per asset
-holding that factor's return *for that asset*. Five things about that directory, none of which
-announces itself:
+holding that factor's return *for that asset*. **The first header may be empty** — the loader takes
+the first column whatever it is called, and a file whose header row starts with a bare comma loads
+(checked on 0.2.0). Five things about that directory, none of which announces itself:
 
 - **The file name is the factor name**, cut at the first dot: `f_residual.volatility.csv` silently
   becomes `f_residual`, and two names that collide overwrite each other.
