@@ -24,6 +24,7 @@ notebook keeps its name inside, because a new experiment copies and renames it.
 """
 
 import argparse
+import functools
 import json
 import pathlib
 import re
@@ -98,18 +99,26 @@ def main() -> int:
 
     REFERENCES_DIRECTORY.mkdir(parents=True, exist_ok=True)
     for template_name, reference_name in DOCUMENTS.items():
-        text = read_template_text(template_name, arguments.source, arguments.reference)
+        document_text = read_template_text(
+            template_name,
+            arguments.source,
+            arguments.reference,
+        )
         (REFERENCES_DIRECTORY / reference_name).write_text(
             rename_experiment(
-                strip_example_content(text),
+                strip_example_content(document_text),
             ),
             encoding="utf-8",
         )
         print(f"  {reference_name}")
     for template_name, reference_name in NOTEBOOK.items():
-        text = read_template_text(template_name, arguments.source, arguments.reference)
+        notebook_text = read_template_text(
+            template_name,
+            arguments.source,
+            arguments.reference,
+        )
         (REFERENCES_DIRECTORY / reference_name).write_text(
-            strip_example_cells(text),
+            strip_example_cells(notebook_text),
             encoding="utf-8",
         )
         print(f"  {reference_name}")
@@ -143,8 +152,10 @@ def read_template_text(
 ) -> str:
     """The text of one template file, from a local checkout or from GitHub."""
     relative_path = f"{EXPERIMENT_DIRECTORY}/{template_name}"
+
     if source is not None:
         path = source / relative_path
+
         if not path.is_file():
             msg = f"{path} does not exist; is --source a checkout of the template?"
 
@@ -153,6 +164,7 @@ def read_template_text(
         return path.read_text(encoding="utf-8")
 
     url = f"{TEMPLATE_RAW_URL}/{reference}/{relative_path}"
+
     with urllib.request.urlopen(url, timeout=30) as response:
 
         return response.read().decode("utf-8")
@@ -162,9 +174,11 @@ def rename_experiment(
     text: str,
 ) -> str:
     """Turn the template's Experiment 1 document into a document for any Experiment N."""
-    renamed = text
-    for pattern, replacement in RENAMES:
-        renamed = pattern.sub(replacement, renamed)
+    renamed = functools.reduce(
+        _apply_rename,
+        RENAMES,
+        text,
+    )
 
     return renamed
 
@@ -179,22 +193,19 @@ def strip_example_cells(
     unchanged template leaves no diff.
     """
     notebook = json.loads(text)
-    kept_cells = []
-    changed = False
-    for cell in notebook["cells"]:
-        source = read_cell_source(cell)
-        if source.startswith(EXAMPLE_ONLY_CELL):
-            changed = True
-            continue
-
-        stripped_source = strip_example_content(source)
-        if stripped_source != source:
-            changed = True
-            write_cell_source(
-                cell,
-                stripped_source.rstrip("\n"),
-            )
-        kept_cells.append(cell)
+    original_cells = notebook["cells"]
+    kept_cells = [
+        cell
+        for cell in original_cells
+        if not _is_example_only_cell(cell)
+    ]
+    rewritten = [
+        _strip_cell(cell)
+        for cell in kept_cells
+    ]
+    cells_dropped = len(kept_cells) != len(original_cells)
+    cells_rewritten = any(rewritten)
+    changed = cells_dropped or cells_rewritten
 
     if not changed:
 
@@ -233,6 +244,7 @@ def strip_example_content(
         stripped,
     )
     trimmed = collapsed.rstrip("\n")
+
     if text.endswith("\n"):
 
         return f"{trimmed}\n"
@@ -249,6 +261,47 @@ def write_cell_source(
         cell["source"] = source.splitlines(keepends=True)
     else:
         cell["source"] = source
+
+
+def _apply_rename(
+    text: str,
+    rename: tuple[re.Pattern[str], str],
+) -> str:
+    """One step of the `_1` to `_N` rewrite, shaped for `functools.reduce`."""
+    pattern, replacement = rename
+    renamed = pattern.sub(
+        replacement,
+        text,
+    )
+
+    return renamed
+
+
+def _is_example_only_cell(
+    cell: dict[str, object],
+) -> bool:
+    """Whether a cell is the worked strategy's alone, marked on its first line."""
+    source = read_cell_source(cell)
+    example_only = source.startswith(EXAMPLE_ONLY_CELL)
+
+    return example_only
+
+
+def _strip_cell(
+    cell: dict[str, object],
+) -> bool:
+    """Strip a kept cell's example lines in place, and say whether anything was removed."""
+    source = read_cell_source(cell)
+    stripped_source = strip_example_content(source)
+    stripped = stripped_source != source
+
+    if stripped:
+        write_cell_source(
+            cell,
+            stripped_source.rstrip("\n"),
+        )
+
+    return stripped
 
 
 if __name__ == "__main__":
